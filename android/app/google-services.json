@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "153394706143",
+    "project_id": "roadstargram",
+    "storage_bucket": "roadstargram.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:153394706143:android:bf927c5d84f475a5525b6a",
+        "android_client_info": {
+          "package_name": "com.example.roadstargram"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "153394706143-dcsh8d57g41urf9afgqlkn2j3gehtj9c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEGi6_H6wEyJDTezPsnTNvJXXS5WClIqs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "153394706143-dcsh8d57g41urf9afgqlkn2j3gehtj9c.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "153394706143-shjb03tkc0liga6jnlc5ob0jcunn7449.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.roadstargram"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
