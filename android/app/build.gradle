@@ -47,8 +47,8 @@ android {
         debug {
             minifyEnabled false
             signingConfig signingConfigs.debug
-            //manifestPlaceholders = [API_Key: ""]
-            manifestPlaceholders = [API_Key: System.getenv("API_Key")]
+            manifestPlaceholders = [API_Key: "AIzaSyD-k4gvNK_gBLK2wJFwPXOgqEDifrs6Kuo"]
+            //manifestPlaceholders = [API_Key: System.getenv("API_Key")]
         }
         release {
             // TODO: Add your own signing config for the release build.
