@@ -5,7 +5,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:roadstargram/markerDB.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -74,6 +73,8 @@ class MapSampleState extends State {
         markers: _markers,
         onMapCreated: (GoogleMapController controller) {
           _controller.complete(controller);
+          MarkerDB marker = MarkerDB();
+          final docList = marker.readAllMarker();
           setState(() {
             _markers.add(
                 Marker(
@@ -84,8 +85,8 @@ class MapSampleState extends State {
           });
         },
         onTap: (LatLng latLang) {
-          MarkerDB marker = MarkerDB(latLang.latitude, latLang.longitude, "マーカー");
-          marker.addMarker();
+          MarkerDB marker = MarkerDB();
+          marker.addMarker(latLang.latitude, latLang.longitude, "マーカー");
           print('Clicked: $latLang, id: $num');
           setState(() {
             _markers.add(

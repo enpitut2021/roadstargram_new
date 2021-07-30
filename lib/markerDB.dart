@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 // MarkerDB marker = MarkerDB();
 // データ追加
 // marker.addMarker(lat, lon, text);
 // データ取り出し
-// doc = marker.readAllMarker();
-// doc["lat"]  doc["lon"] doc["text"]
+// docList = marker.readAllMarker();
+// docList.forEach((doc) => {
+//  doc["lat"]  doc["lon"] doc["text"]...
 
 class MarkerDB {
   late CollectionReference marker;
@@ -27,6 +29,9 @@ class MarkerDB {
     List<QueryDocumentSnapshot> docList = [];
     marker.get().then((QuerySnapshot querySnapshot) {
       docList = querySnapshot.docs;
+      docList.forEach((doc) {
+        print("${doc["lat"]} ${doc["lon"]} ${doc["text"]}");
+      });
     });
     return Future<List<QueryDocumentSnapshot>>.value(docList);
   }
