@@ -71,6 +71,7 @@ app.*.map.json
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
 
+
 ios/Runner/.env
 
 pubspec.lock
