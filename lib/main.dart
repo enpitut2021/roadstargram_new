@@ -25,14 +25,16 @@ class MapSampleState extends State {
   Set<Marker> _markers = {};
   var num = 0;
 
-  static final CameraPosition _kNSK = CameraPosition(
-    target: LatLng(35.17176088096857, 136.88817886263607),
+  static final CameraPosition _kTsukubaStaion = CameraPosition(//TsukubaStation
+    //target: LatLng(35.17176088096857, 136.88817886263607),
+    target: LatLng(36.082528276755205, 140.11170887850292),
     zoom: 14.4746,
   );
 
-  static final CameraPosition _kNagoyajo = CameraPosition(
+  static final CameraPosition _kITF = CameraPosition(//ITF
       bearing: 192.8334901395799,
-      target: LatLng(35.184910766826086, 136.8996468623372),
+      //target: LatLng(35.184910766826086, 136.8996468623372),
+      target: LatLng(36.10678749790326, 140.10190729280725),
       tilt: 59.440717697143555,
       zoom: 19.151926040649414);
 
@@ -41,15 +43,15 @@ class MapSampleState extends State {
     return new Scaffold(
       body: GoogleMap(
         mapType: MapType.normal,
-        initialCameraPosition: _kNSK,
+        initialCameraPosition: _kTsukubaStaion,
         markers: _markers,
         onMapCreated: (GoogleMapController controller) {
           _controller.complete(controller);
           setState(() {
             _markers.add(
                 Marker(
-                  markerId: MarkerId('marker_1'),
-                  position: LatLng(35.184910766826086, 136.8996468623372),
+                  markerId: MarkerId('marker_ITF'),
+                  position: LatLng(36.10678749790326, 140.10190729280725),
                 )
             );
           });
@@ -73,7 +75,7 @@ class MapSampleState extends State {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _goToTheNagoyajo,
-        label: Text('To the 名古屋城!'),
+        label: Text('To the ITF!'),
         icon: Icon(Icons.directions_bike),
       ),
     );
@@ -81,7 +83,7 @@ class MapSampleState extends State {
 
   Future _goToTheNagoyajo() async {
     final GoogleMapController controller = await _controller.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(_kNagoyajo));
+    controller.animateCamera(CameraUpdate.newCameraPosition(_kITF));
   }
   /*
   void _onMapCreated(GoogleMapController controller) {
