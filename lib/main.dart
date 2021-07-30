@@ -2,9 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:roadstargram/pin.dart';
-// Pin pin = Pin(lat, lon, text);
-// pin.addPin();
+import 'package:roadstargram/markerDB.dart';
+
 
 void main() => runApp(MyApp());
 
