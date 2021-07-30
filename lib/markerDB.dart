@@ -1,24 +1,33 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-// Pin pin = Pin(lat, lon, text);
-// pin.addPin();
+// MarkerDB marker = MarkerDB();
+// データ追加
+// marker.addMarker(lat, lon, text);
+// データ取り出し
+// doc = marker.readAllMarker();
+// doc["lat"]  doc["lon"] doc["text"]
 
 class MarkerDB {
-  final double lat;
-  final double lon;
-  final String text;
   late CollectionReference marker;
 
-  MarkerDB(this.lat, this.lon, this.text) {
+  MarkerDB() {
     marker = FirebaseFirestore.instance.collection('marker');
   }
 
-  Future<void> addMarker() {
+  Future<void> addMarker(lat, lon, text) {
     return marker.add({
-      'lat': this.lat,
-      'lon': this.lon,
-      'text': this.text,
+      'lat': lat,
+      'lon': lon,
+      'text': text,
     })
     .then((value) => print("Marker added"))
     .catchError((error) => print("Failed to add marker: $error"));
+  }
+
+  Future<List<QueryDocumentSnapshot>> readAllMarker() {
+    List<QueryDocumentSnapshot> docList = [];
+    marker.get().then((QuerySnapshot querySnapshot) {
+      docList = querySnapshot.docs;
+    });
+    return Future<List<QueryDocumentSnapshot>>.value(docList);
   }
 }
