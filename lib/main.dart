@@ -23,6 +23,7 @@ class MapSample extends StatefulWidget {
 class MapSampleState extends State {
   Completer _controller = Completer();
   Set<Marker> _markers = {};
+  var num = 0;
 
   static final CameraPosition _kNSK = CameraPosition(
     target: LatLng(35.17176088096857, 136.88817886263607),
@@ -52,6 +53,18 @@ class MapSampleState extends State {
                 )
             );
           });
+        },
+        onTap: (LatLng latLang) {
+          print('Clicked: $latLang, id: $num');
+          setState(() {
+            _markers.add(
+                Marker(
+                  markerId: MarkerId('marker_' + num.toString()),
+                  position: latLang,
+                )
+            );
+          });
+          num = num + 1;
         },
         myLocationEnabled: true,
         myLocationButtonEnabled: true,
