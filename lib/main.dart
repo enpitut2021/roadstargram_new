@@ -61,6 +61,7 @@ class MapSampleState extends State {
                 Marker(
                   markerId: MarkerId('marker_' + num.toString()),
                   position: latLang,
+                  infoWindow: InfoWindow(title: "マーカー")
                 )
             );
           });
