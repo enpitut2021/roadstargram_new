@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-// Pin pin = Pin(lat, lon, text);
-// pin.addPin();
+// MarkerDB marker = MarkerDB(lat, lon, text);
+// marker.addMarker();
 
 class MarkerDB {
   final double lat;

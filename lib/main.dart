@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:roadstargram/markerDB.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 
 void main() => runApp(MyApp());
@@ -26,6 +27,30 @@ class MapSampleState extends State {
   Completer _controller = Completer();
   Set<Marker> _markers = {};
   var num = 0;
+  bool _initialized = false;
+  bool _error = false;
+
+  // Define an async function to initialize FlutterFire
+  void initializeFlutterFire() async {
+    try {
+      // Wait for Firebase to initialize and set `_initialized` state to true
+      await Firebase.initializeApp();
+      setState(() {
+        _initialized = true;
+      });
+    } catch(e) {
+      // Set `_error` state to true if Firebase initialization fails
+      setState(() {
+        _error = true;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    initializeFlutterFire();
+    super.initState();
+  }
 
   static final CameraPosition _kTsukubaStaion = CameraPosition(//TsukubaStation
     //target: LatLng(35.17176088096857, 136.88817886263607),
@@ -59,6 +84,8 @@ class MapSampleState extends State {
           });
         },
         onTap: (LatLng latLang) {
+          MarkerDB marker = MarkerDB(latLang.latitude, latLang.longitude, "マーカー");
+          marker.addMarker();
           print('Clicked: $latLang, id: $num');
           setState(() {
             _markers.add(
