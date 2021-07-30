@@ -24,15 +24,4 @@ class MarkerDB {
     .then((value) => print("Marker added"))
     .catchError((error) => print("Failed to add marker: $error"));
   }
-
-  Future<List<QueryDocumentSnapshot>> readAllMarker() {
-    List<QueryDocumentSnapshot> docList = [];
-    marker.get().then((QuerySnapshot querySnapshot) {
-      docList = querySnapshot.docs;
-      docList.forEach((doc) {
-        print("${doc["lat"]} ${doc["lon"]} ${doc["text"]}");
-      });
-    });
-    return Future<List<QueryDocumentSnapshot>>.value(docList);
-  }
 }

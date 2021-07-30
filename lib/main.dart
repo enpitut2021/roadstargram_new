@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:roadstargram/markerDB.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() => runApp(MyApp());
 
@@ -64,6 +65,25 @@ class MapSampleState extends State {
       tilt: 59.440717697143555,
       zoom: 19.151926040649414);
 
+  void showAllMarker() {
+    final marker = FirebaseFirestore.instance.collection('marker');
+    marker.get().then((QuerySnapshot querySnapshot) {
+      int i=0;
+      querySnapshot.docs.forEach((doc) {
+        //print(doc["lat"]);
+        setState(() {
+          _markers.add(
+              Marker(
+                markerId: MarkerId(i.toString()),
+                position: LatLng(doc["lat"], doc["lon"]),
+              )
+          );
+        });
+        i++;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -73,8 +93,8 @@ class MapSampleState extends State {
         markers: _markers,
         onMapCreated: (GoogleMapController controller) {
           _controller.complete(controller);
-          MarkerDB marker = MarkerDB();
-          final docList = marker.readAllMarker();
+          showAllMarker();
+
           setState(() {
             _markers.add(
                 Marker(
