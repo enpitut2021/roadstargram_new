@@ -85,19 +85,51 @@ class MapSampleState extends State {
           });
         },
         onTap: (LatLng latLang) {
-          MarkerDB marker = MarkerDB();
-          marker.addMarker(latLang.latitude, latLang.longitude, "マーカー");
-          print('Clicked: $latLang, id: $num');
-          setState(() {
-            _markers.add(
-                Marker(
-                  markerId: MarkerId('marker_' + num.toString()),
-                  position: latLang,
-                  infoWindow: InfoWindow(title: "マーカー")
-                )
-            );
-          });
-          num = num + 1;
+          var _textController = TextEditingController();
+          showDialog(
+            context: context,
+            builder: (_) {
+              return AlertDialog(
+                title: Text("レビューを入力"),
+                content: TextField(
+                  controller: _textController,
+                  decoration: InputDecoration(
+                    hintText: '景色がキレイ',
+                  ),
+                  autofocus: true,
+                  // keyboardType: TextInputType.number,
+                ),
+                actions: <Widget>[
+                  // ボタン領域
+                  FlatButton(
+                    child: Text("Cancel"),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  FlatButton(
+                    child: Text("OK"),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      setState(() {
+                        _markers.add(
+                            Marker(
+                                markerId: MarkerId('marker_' + num.toString()),
+                                position: latLang,
+                                infoWindow: InfoWindow(title: _textController.text)
+                            )
+                        );
+                      });
+                      MarkerDB marker = MarkerDB();
+                      marker.addMarker(latLang.latitude, latLang.longitude, _textController.text);
+                      print('Clicked: $latLang, id: $num');
+                      num = num + 1;
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+
+
         },
         myLocationEnabled: true,
         myLocationButtonEnabled: true,
