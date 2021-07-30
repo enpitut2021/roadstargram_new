@@ -38,12 +38,13 @@ class MapSampleState extends State {
   Widget build(BuildContext context) {
     return new Scaffold(
       body: GoogleMap(
-        mapType: MapType.hybrid,
+        mapType: MapType.normal,
         initialCameraPosition: _kNSK,
         onMapCreated: (GoogleMapController controller) {
           _controller.complete(controller);
         },
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _goToTheNagoyajo,
         label: Text('To the 名古屋城!'),
