@@ -1,4 +1,4 @@
-client:
+jjclient:
   name: basic
   version: 0
   file-system: default
