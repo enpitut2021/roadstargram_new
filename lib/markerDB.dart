@@ -6,7 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 // データ取り出し
 // docList = marker.readAllMarker();
 // docList.forEach((doc) => {
-//  doc["lat"]  doc["lon"] doc["text"]...
+//  doc["lat"]  doc["lon"] doc["text"]...};
 
 class MarkerDB {
   late CollectionReference marker;
