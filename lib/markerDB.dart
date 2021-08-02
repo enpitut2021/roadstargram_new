@@ -33,7 +33,7 @@ class MarkerDB {
     return marker.doc(id).update({
       'iine': iine,
     }).then((value) => {
-      print("Marker iine updated")
+      print("Marker iine updated: $id")
     }).catchError((error) => print("Failed to update marker: $error"));
   }
 }

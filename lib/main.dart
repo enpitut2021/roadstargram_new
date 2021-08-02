@@ -6,15 +6,31 @@ import 'package:roadstargram/markerDB.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
+  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Google Maps Demo',
-      home: MapSample(),
-    );
+    return FutureBuilder(
+        // Initialize FlutterFire:
+        future: _initialization,
+        builder: (context, snapshot) {
+          if(snapshot.hasError) {
+            return MaterialApp(home: Text("Error"));
+          }
+          if (snapshot.connectionState == ConnectionState.done) {
+            return MaterialApp(
+              title: 'Flutter Google Maps Demo',
+              home: MapSample(),
+            );
+          }
+          return MaterialApp(home: CircularProgressIndicator());
+        });
   }
 }
 
@@ -27,189 +43,141 @@ class MapSampleState extends State {
   Completer _controller = Completer();
   Set<Marker> _markers = {};
   var num = 0;
-  bool _initialized = false;
-  bool _error = false;
+  final markerStream = FirebaseFirestore.instance.collection('marker').snapshots();
+  final MarkerDB markerDB = MarkerDB();
 
-  // Define an async function to initialize FlutterFire
-  void initializeFlutterFire() async {
-    try {
-      // Wait for Firebase to initialize and set `_initialized` state to true
-      await Firebase.initializeApp();
-      setState(() {
-        _initialized = true;
-      });
-    } catch(e) {
-      // Set `_error` state to true if Firebase initialization fails
-      setState(() {
-        _error = true;
-      });
-    }
-  }
-
-  @override
-  void initState() {
-    initializeFlutterFire();
-    super.initState();
-  }
-
-  static final CameraPosition _kTsukubaStaion = CameraPosition(//TsukubaStation
+  static final CameraPosition _kTsukubaStaion = CameraPosition(
+    //TsukubaStation
     //target: LatLng(35.17176088096857, 136.88817886263607),
     target: LatLng(36.082528276755205, 140.11170887850292),
     zoom: 14.4746,
   );
 
-  static final CameraPosition _kITF = CameraPosition(//ITF
+  static final CameraPosition _kITF = CameraPosition(
+      //ITF
       bearing: 192.8334901395799,
       //target: LatLng(35.184910766826086, 136.8996468623372),
       target: LatLng(36.10678749790326, 140.10190729280725),
       tilt: 59.440717697143555,
       zoom: 19.151926040649414);
 
-  void showAllMarker() {
-    final marker = FirebaseFirestore.instance.collection('marker');
-    final markerDB = MarkerDB();
-    marker.get().then((QuerySnapshot querySnapshot) {
-      int i=0;
-
-      querySnapshot.docs.forEach((doc) {
-        int iine_num = doc["iine"];
-        //print(doc["lat"]);
-        setState(() {
-          _markers.add(
-              Marker(
-                markerId: MarkerId(i.toString()),
-                position: LatLng(doc["lat"], doc["lon"]),
-                icon: BitmapDescriptor.defaultMarkerWithHue(getMarkerColor(doc["goodDeg"])),
-                infoWindow: InfoWindow(
-                  title: doc["text"], 
-                  snippet: "いいね数：" + iine_num.toString(),
-                  onTap: () {
-                    iine_num++;
-                    print(iine_num);
-                    markerDB.updateIine(doc.id, iine_num);
-                  }),
-              )
-          );
-        });
-        i++;
-      });
-    });
-  }
-
-  double getMarkerColor(int color){
-    
-    if (color == 1){
+  double getMarkerColor(int color) {
+    if (color == 1) {
       return BitmapDescriptor.hueRed; //good評価
-    }
-    else if (color == 0){
+    } else if (color == 0) {
       return BitmapDescriptor.hueGreen; //normal評価
-    }
-    else{
+    } else {
       return BitmapDescriptor.hueBlue; //bad評価
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      body: GoogleMap(
-        mapType: MapType.normal,
-        initialCameraPosition: _kTsukubaStaion,
-        markers: _markers,
-        onMapCreated: (GoogleMapController controller) {
-          _controller.complete(controller);
-          showAllMarker();
-
-          setState(() {
-            _markers.add(
-                Marker(
+    return StreamBuilder<QuerySnapshot>(
+        stream: markerStream,
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) {
+            return Text('Something went wrong');
+          }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator();
+          }
+          return new Scaffold(
+            body: GoogleMap(
+              mapType: MapType.normal,
+              initialCameraPosition: _kTsukubaStaion,
+              markers: snapshot.data?.docs
+                      .map((DocumentSnapshot doc) {
+                        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+                        int iineNum = data["iine"] ?? 0;
+                        return Marker(
+                              markerId: MarkerId(doc.id),
+                              position: LatLng(data["lat"], data["lon"]),
+                              icon: BitmapDescriptor.defaultMarkerWithHue(
+                                  getMarkerColor(data["goodDeg"])),
+                              infoWindow: InfoWindow(
+                                  title: data["text"],
+                                  snippet: "いいね数：$iineNum",
+                                  onTap: () {
+                                    iineNum++;
+                                    print(iineNum);
+                                    markerDB.updateIine(doc.id, iineNum);
+                                  }),
+                            );
+                      })
+                      .toSet() ??
+                  Set<Marker>(),
+              onMapCreated: (GoogleMapController controller) {
+                _controller.complete(controller);
+                _markers.add(Marker(
                   markerId: MarkerId('marker_ITF'),
                   position: LatLng(36.10678749790326, 140.10190729280725),
-                )
-            );
-          });
-        },
-        onTap: (LatLng latLang) {
-          var _textController = TextEditingController();
-          showDialog(
-            context: context,
-            builder: (_) {
-              return AlertDialog(
-                title: Text("レビューを入力"),
-                content: TextField(
-                  controller: _textController,
-                  decoration: InputDecoration(
-                    hintText: '景色がキレイ',
-                  ),
-                  autofocus: true,
-                  // keyboardType: TextInputType.number,
-                ),
-                actions: <Widget>[
-                  // ボタン領域
-                  FlatButton(
-                    child: Text("Good!!"),
-                      onPressed: () {
-                        Navigator.pop(context);
-                        setState(() {
-                          _markers.add(
-                            Marker(
-                              markerId: MarkerId('marker_' + num.toString()),
-                              position: latLang,
-                              icon: BitmapDescriptor.defaultMarkerWithHue(getMarkerColor(1)),
-                              infoWindow: InfoWindow(title: _textController.text)
-                            )
-                          );
-                        });
-                        MarkerDB marker = MarkerDB();
-                        marker.addMarker(latLang.latitude, latLang.longitude, _textController.text, 1);
-                        print('Clicked: $latLang, id: $num');
-                        num = num + 1;
-                      },
-                  ),
-                  FlatButton(
-                    child: Text("Bad"),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      setState(() {
-                        _markers.add(
-                            Marker(
-                                markerId: MarkerId('marker_' + num.toString()),
-                                position: latLang,
-                                icon: BitmapDescriptor.defaultMarkerWithHue(getMarkerColor(-1)),
-                                infoWindow: InfoWindow(title: _textController.text)
-                            )
-                        );
-                      });
-                      MarkerDB marker = MarkerDB();
-                      marker.addMarker(latLang.latitude, latLang.longitude, _textController.text, -1);//固定値でgood1
-                      print('Clicked: $latLang, id: $num');
-                      num = num + 1;
-                    },
-                  ),
-                ],
-              );
-            },
+                ));
+              },
+              onTap: (LatLng latLang) {
+                var _textController = TextEditingController();
+                showDialog(
+                  context: context,
+                  builder: (_) {
+                    return AlertDialog(
+                      title: Text("レビューを入力"),
+                      content: TextField(
+                        controller: _textController,
+                        decoration: InputDecoration(
+                          hintText: '景色がキレイ',
+                        ),
+                        autofocus: true,
+                        // keyboardType: TextInputType.number,
+                      ),
+                      actions: <Widget>[
+                        // ボタン領域
+                        FlatButton(
+                          child: Text("Good!!"),
+                          onPressed: () {
+                            Navigator.pop(context);
+                            markerDB.addMarker(latLang.latitude,
+                                latLang.longitude, _textController.text, 1);
+                            print('Clicked: $latLang, id: $num');
+                            num = num + 1;
+                          },
+                        ),
+                        FlatButton(
+                          child: Text("Bad"),
+                          onPressed: () {
+                            Navigator.pop(context);
+                            markerDB.addMarker(
+                                latLang.latitude,
+                                latLang.longitude,
+                                _textController.text,
+                                -1); //固定値でgood1
+                            print('Clicked: $latLang, id: $num');
+                            num = num + 1;
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              myLocationEnabled: true,
+              myLocationButtonEnabled: true,
+            ),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerFloat,
+            floatingActionButton: FloatingActionButton.extended(
+              onPressed: _goToTheNagoyajo,
+              label: Text('To the ITF!'),
+              icon: Icon(Icons.directions_bike),
+            ),
           );
-
-
-        },
-        myLocationEnabled: true,
-        myLocationButtonEnabled: true,
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _goToTheNagoyajo,
-        label: Text('To the ITF!'),
-        icon: Icon(Icons.directions_bike),
-      ),
-    );
+        });
   }
 
   Future _goToTheNagoyajo() async {
     final GoogleMapController controller = await _controller.future;
     controller.animateCamera(CameraUpdate.newCameraPosition(_kITF));
   }
-  /*
+/*
   void _onMapCreated(GoogleMapController controller) {
     setState(() {
       mapController = controller;
