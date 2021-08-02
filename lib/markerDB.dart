@@ -28,6 +28,14 @@ class MarkerDB {
     })
     .catchError((error) => print("Failed to add marker: $error"));
   }
+
+  Future<void> updateIine(id, iine) {
+    return marker.doc(id).update({
+      'iine': iine,
+    }).then((value) => {
+      print("Marker iine updated")
+    }).catchError((error) => print("Failed to update marker: $error"));
+  }
 }
 
 

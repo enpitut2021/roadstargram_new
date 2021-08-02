@@ -67,10 +67,12 @@ class MapSampleState extends State {
 
   void showAllMarker() {
     final marker = FirebaseFirestore.instance.collection('marker');
+    final markerDB = MarkerDB();
     marker.get().then((QuerySnapshot querySnapshot) {
       int i=0;
 
       querySnapshot.docs.forEach((doc) {
+        int iine_num = doc["iine"];
         //print(doc["lat"]);
         setState(() {
           _markers.add(
@@ -78,7 +80,14 @@ class MapSampleState extends State {
                 markerId: MarkerId(i.toString()),
                 position: LatLng(doc["lat"], doc["lon"]),
                 icon: BitmapDescriptor.defaultMarkerWithHue(getMarkerColor(doc["goodDeg"])),
-                infoWindow: InfoWindow(title: doc["text"], snippet: "いいね数：" + doc["iine"].toString()),
+                infoWindow: InfoWindow(
+                  title: doc["text"], 
+                  snippet: "いいね数：" + iine_num.toString(),
+                  onTap: () {
+                    iine_num++;
+                    print(iine_num);
+                    markerDB.updateIine(doc.id, iine_num);
+                  }),
               )
           );
         });
