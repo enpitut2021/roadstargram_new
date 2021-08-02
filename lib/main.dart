@@ -172,7 +172,7 @@ class MapSampleState extends State {
                         );
                       });
                       MarkerDB marker = MarkerDB();
-                      marker.addMarker(latLang.latitude, latLang.longitude, _textController.text, -1);//固定値でgood1
+                      marker.addMarker(latLang.latitude, latLang.longitude, _textController.text, -1);//-1でBad指定
                       print('Clicked: $latLang, id: $num');
                       num = num + 1;
                     },
