@@ -78,7 +78,7 @@ class MapSampleState extends State {
                 markerId: MarkerId(i.toString()),
                 position: LatLng(doc["lat"], doc["lon"]),
                 icon: BitmapDescriptor.defaultMarkerWithHue(getMarkerColor(doc["goodDeg"])),
-                infoWindow: InfoWindow(title: doc["text"]),
+                infoWindow: InfoWindow(title: doc["text"], snippet: "いいね数：" + doc["iine"].toString()),
               )
           );
         });
