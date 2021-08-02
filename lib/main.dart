@@ -138,11 +138,27 @@ class MapSampleState extends State {
                 actions: <Widget>[
                   // ボタン領域
                   FlatButton(
-                    child: Text("Cancel"),
-                    onPressed: () => Navigator.pop(context),
+                    child: Text("Good!!"),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        setState(() {
+                          _markers.add(
+                            Marker(
+                              markerId: MarkerId('marker_' + num.toString()),
+                              position: latLang,
+                              icon: BitmapDescriptor.defaultMarkerWithHue(getMarkerColor(1)),
+                              infoWindow: InfoWindow(title: _textController.text)
+                            )
+                          );
+                        });
+                        MarkerDB marker = MarkerDB();
+                        marker.addMarker(latLang.latitude, latLang.longitude, _textController.text, 1);
+                        print('Clicked: $latLang, id: $num');
+                        num = num + 1;
+                      },
                   ),
                   FlatButton(
-                    child: Text("OK"),
+                    child: Text("Bad"),
                     onPressed: () {
                       Navigator.pop(context);
                       setState(() {
@@ -150,12 +166,13 @@ class MapSampleState extends State {
                             Marker(
                                 markerId: MarkerId('marker_' + num.toString()),
                                 position: latLang,
+                                icon: BitmapDescriptor.defaultMarkerWithHue(getMarkerColor(-1)),
                                 infoWindow: InfoWindow(title: _textController.text)
                             )
                         );
                       });
                       MarkerDB marker = MarkerDB();
-                      marker.addMarker(latLang.latitude, latLang.longitude, _textController.text,1);//固定値でgood1
+                      marker.addMarker(latLang.latitude, latLang.longitude, _textController.text, -1);//固定値でgood1
                       print('Clicked: $latLang, id: $num');
                       num = num + 1;
                     },
