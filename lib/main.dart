@@ -69,6 +69,7 @@ class MapSampleState extends State {
     final marker = FirebaseFirestore.instance.collection('marker');
     marker.get().then((QuerySnapshot querySnapshot) {
       int i=0;
+
       querySnapshot.docs.forEach((doc) {
         //print(doc["lat"]);
         setState(() {
@@ -76,12 +77,26 @@ class MapSampleState extends State {
               Marker(
                 markerId: MarkerId(i.toString()),
                 position: LatLng(doc["lat"], doc["lon"]),
+                icon: BitmapDescriptor.defaultMarkerWithHue(getMarkerColor(doc["goodDeg"]))
               )
           );
         });
         i++;
       });
     });
+  }
+
+  double getMarkerColor(int color){
+    
+    if (color == 1){
+      return BitmapDescriptor.hueRed; //good評価
+    }
+    else if (color == 0){
+      return BitmapDescriptor.hueGreen; //normal評価
+    }
+    else{
+      return BitmapDescriptor.hueBlue; //bad評価
+    }
   }
 
   @override
@@ -139,7 +154,7 @@ class MapSampleState extends State {
                         );
                       });
                       MarkerDB marker = MarkerDB();
-                      marker.addMarker(latLang.latitude, latLang.longitude, _textController.text);
+                      marker.addMarker(latLang.latitude, latLang.longitude, _textController.text,1);//固定値でgood1
                       print('Clicked: $latLang, id: $num');
                       num = num + 1;
                     },

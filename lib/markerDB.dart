@@ -15,13 +15,20 @@ class MarkerDB {
     marker = FirebaseFirestore.instance.collection('marker');
   }
 
-  Future<void> addMarker(lat, lon, text) {
+  Future<void> addMarker(lat, lon, text,goodDeg) {
     return marker.add({
       'lat': lat,
       'lon': lon,
       'text': text,
+      'goodDeg':goodDeg, //1:good,0:soso,-1:bad
     })
-    .then((value) => print("Marker added"))
+    .then((value) => {
+      print("Marker added: ${value.id}")
+    })
     .catchError((error) => print("Failed to add marker: $error"));
   }
 }
+
+
+
+
