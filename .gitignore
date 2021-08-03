@@ -76,3 +76,4 @@ app.*.map.json
 ios/Runner/.env
 
 pubspec.lock
+ios/Podfile.lock
