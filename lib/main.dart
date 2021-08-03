@@ -76,6 +76,16 @@ class MapSampleState extends State {
     }
   }
 
+  Color getPolylineColor(int color) {
+    if (color == 1) {
+      return Colors.red; //good評価
+    } else if (color == 0) {
+      return Colors.green; //normal評価
+    } else {
+      return Colors.blue; //bad評価
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
@@ -102,7 +112,8 @@ class MapSampleState extends State {
                   visible: true,
                   //latlng is List<LatLng>
                   points: latLngList,
-                  color: Colors.blue,
+                  color: getPolylineColor(doc["goodDeg"]),
+                  width: 6,
                 );
               }).toSet() ??
                   Set<Polyline>(),
