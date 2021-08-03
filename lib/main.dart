@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
         // Initialize FlutterFire:
         future: _initialization,
         builder: (context, snapshot) {
-          if(snapshot.hasError) {
+          if (snapshot.hasError) {
             return MaterialApp(home: Text("Error"));
           }
           if (snapshot.connectionState == ConnectionState.done) {
@@ -43,7 +43,11 @@ class MapSampleState extends State {
   Completer _controller = Completer();
   Set<Marker> _markers = {};
   var num = 0;
-  final markerStream = FirebaseFirestore.instance.collection('marker').snapshots();
+  bool _is_tapped = false;
+  List<double> lats = [];
+  List<double> lons = [];
+  final markerStream =
+      FirebaseFirestore.instance.collection('marker').snapshots();
   final MarkerDB markerDB = MarkerDB();
 
   static final CameraPosition _kTsukubaStaion = CameraPosition(
@@ -86,26 +90,25 @@ class MapSampleState extends State {
             body: GoogleMap(
               mapType: MapType.normal,
               initialCameraPosition: _kTsukubaStaion,
-              markers: snapshot.data?.docs
-                      .map((DocumentSnapshot doc) {
-                        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-                        int iineNum = data["iine"] ?? 0;
-                        return Marker(
-                              markerId: MarkerId(doc.id),
-                              position: LatLng(data["lat"], data["lon"]),
-                              icon: BitmapDescriptor.defaultMarkerWithHue(
-                                  getMarkerColor(data["goodDeg"])),
-                              infoWindow: InfoWindow(
-                                  title: data["text"],
-                                  snippet: "いいね数：$iineNum",
-                                  onTap: () {
-                                    iineNum++;
-                                    print(iineNum);
-                                    markerDB.updateIine(doc.id, iineNum);
-                                  }),
-                            );
-                      })
-                      .toSet() ??
+              markers: snapshot.data?.docs.map((DocumentSnapshot doc) {
+                    Map<String, dynamic> data =
+                        doc.data() as Map<String, dynamic>;
+                    int iineNum = data["iine"] ?? 0;
+                    return Marker(
+                      markerId: MarkerId(doc.id),
+                      position: LatLng(data["lat"], data["lon"]),
+                      icon: BitmapDescriptor.defaultMarkerWithHue(
+                          getMarkerColor(data["goodDeg"])),
+                      infoWindow: InfoWindow(
+                          title: data["text"],
+                          snippet: "いいね数：$iineNum",
+                          onTap: () {
+                            iineNum++;
+                            print(iineNum);
+                            markerDB.updateIine(doc.id, iineNum);
+                          }),
+                    );
+                  }).toSet() ??
                   Set<Marker>(),
               onMapCreated: (GoogleMapController controller) {
                 _controller.complete(controller);
@@ -115,49 +118,60 @@ class MapSampleState extends State {
                 ));
               },
               onTap: (LatLng latLang) {
-                var _textController = TextEditingController();
-                showDialog(
-                  context: context,
-                  builder: (_) {
-                    return AlertDialog(
-                      title: Text("レビューを入力"),
-                      content: TextField(
-                        controller: _textController,
-                        decoration: InputDecoration(
-                          hintText: '景色がキレイ',
+                if (!_is_tapped) {
+                  _is_tapped = true;
+                  lons.add(latLang.longitude);
+                  lats.add(latLang.latitude);
+                  print(lons);
+                  print(lats);
+                } else {
+                  _is_tapped = false;
+                  lons = [];
+                  lats = [];
+                  var _textController = TextEditingController();
+                  showDialog(
+                    context: context,
+                    builder: (_) {
+                      return AlertDialog(
+                        title: Text("レビューを入力"),
+                        content: TextField(
+                          controller: _textController,
+                          decoration: InputDecoration(
+                            hintText: '景色がキレイ',
+                          ),
+                          autofocus: true,
+                          // keyboardType: TextInputType.number,
                         ),
-                        autofocus: true,
-                        // keyboardType: TextInputType.number,
-                      ),
-                      actions: <Widget>[
-                        // ボタン領域
-                        FlatButton(
-                          child: Text("Good!!"),
-                          onPressed: () {
-                            Navigator.pop(context);
-                            markerDB.addMarker(latLang.latitude,
-                                latLang.longitude, _textController.text, 1);
-                            print('Clicked: $latLang, id: $num');
-                            num = num + 1;
-                          },
-                        ),
-                        FlatButton(
-                          child: Text("Bad"),
-                          onPressed: () {
-                            Navigator.pop(context);
-                            markerDB.addMarker(
-                                latLang.latitude,
-                                latLang.longitude,
-                                _textController.text,
-                                -1); //固定値でgood1
-                            print('Clicked: $latLang, id: $num');
-                            num = num + 1;
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                );
+                        actions: <Widget>[
+                          // ボタン領域
+                          FlatButton(
+                            child: Text("Good!!"),
+                            onPressed: () {
+                              Navigator.pop(context);
+                              markerDB.addMarker(latLang.latitude,
+                                  latLang.longitude, _textController.text, 1);
+                              print('Clicked: $latLang, id: $num');
+                              num = num + 1;
+                            },
+                          ),
+                          FlatButton(
+                            child: Text("Bad"),
+                            onPressed: () {
+                              Navigator.pop(context);
+                              markerDB.addMarker(
+                                  latLang.latitude,
+                                  latLang.longitude,
+                                  _textController.text,
+                                  -1); //固定値でgood1
+                              print('Clicked: $latLang, id: $num');
+                              num = num + 1;
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
               },
               myLocationEnabled: true,
               myLocationButtonEnabled: true,
