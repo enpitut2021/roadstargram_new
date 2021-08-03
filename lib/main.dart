@@ -50,7 +50,7 @@ class MapSampleState extends State {
   List<double> lons = [];
   List<LatLng> latlnglist = [];
   final markerStream =
-      FirebaseFirestore.instance.collection('marker').snapshots();
+      FirebaseFirestore.instance.collection('markerTest').snapshots();
   final MarkerDB markerDB = MarkerDB();
 
   static final CameraPosition _kTsukubaStaion = CameraPosition(
@@ -93,13 +93,30 @@ class MapSampleState extends State {
             body: GoogleMap(
               mapType: MapType.normal,
               initialCameraPosition: _kTsukubaStaion,
+              polylines: snapshot.data?.docs.map((DocumentSnapshot doc) {
+                Map<String, dynamic> data =
+                doc.data() as Map<String, dynamic>;
+                List<LatLng> latLngList = [];
+                latLngList.add(LatLng(doc["lat"][0], doc["lon"][0]));
+                latLngList.add(LatLng(doc["lat"][1], doc["lon"][1]));
+                return Polyline(
+                  polylineId: PolylineId(doc.id),
+                  visible: true,
+                  //latlng is List<LatLng>
+                  points: latLngList,
+                  color: Colors.blue,
+                );
+              }).toSet() ??
+                  Set<Polyline>(),
               markers: snapshot.data?.docs.map((DocumentSnapshot doc) {
                     Map<String, dynamic> data =
                         doc.data() as Map<String, dynamic>;
                     int iineNum = data["iine"] ?? 0;
+                    double latavg = (data["lat"][0] + data["lat"][1]) / 2.0;
+                    double lonavg = (data["lon"][0] + data["lon"][1]) / 2.0;
                     return Marker(
                       markerId: MarkerId(doc.id),
-                      position: LatLng(data["lat"], data["lon"]),
+                      position: LatLng(latavg, lonavg),
                       icon: BitmapDescriptor.defaultMarkerWithHue(
                           getMarkerColor(data["goodDeg"])),
                       infoWindow: InfoWindow(
@@ -130,13 +147,17 @@ class MapSampleState extends State {
                   print(lats);
                 } else if (_is_first_tapped && !_is_second_tapped) {
                   _is_second_tapped = true;
-
                   LatLng _lastMapPosition = latLang;
                   latlnglist.add(latLang);
                   lons.add(latLang.longitude);
                   lats.add(latLang.latitude);
                   print(lons);
                   print(lats);
+                  markerDB.addMarker(
+                      lats,
+                      lons,
+                      "aaa",
+                      -1);
                 }else {
                   _is_first_tapped = false;
                   _is_second_tapped = false;
