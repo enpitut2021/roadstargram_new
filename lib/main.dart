@@ -233,16 +233,4 @@ class MapSampleState extends State {
     final GoogleMapController controller = await _controller.future;
     controller.animateCamera(CameraUpdate.newCameraPosition(_kITF));
   }
-/*
-  void _onMapCreated(GoogleMapController controller) {
-    setState(() {
-      mapController = controller;
-      var options = MarkerOptions(
-          position: LatLng(35.6580339,139.7016358),
-          infoWindowText: InfoWindowText("タイトル", "説明分等")
-      );
-      mapController.addMarker(options);
-    });
-
-   */
 }
