@@ -43,10 +43,12 @@ class MapSampleState extends State {
   Completer _controller = Completer();
   Set<Marker> _markers = {};
   var num = 0;
+  bool _is_input_mode = false;
   bool _is_first_tapped = false;
   bool _is_second_tapped = false;
   List<double> lats = [];
   List<double> lons = [];
+  String _message = '道入力';
   final markerStream =
       FirebaseFirestore.instance.collection('markerTest').snapshots();
   final MarkerDB markerDB = MarkerDB();
@@ -147,7 +149,8 @@ class MapSampleState extends State {
                 ));
               },
               onTap: (LatLng latLang) {
-                if (!_is_first_tapped && !_is_second_tapped) {
+                if (!_is_input_mode){
+                }else if (!_is_first_tapped && !_is_second_tapped) {
                   _is_first_tapped = true;
                   lons.add(latLang.longitude);
                   lats.add(latLang.latitude);
@@ -213,6 +216,8 @@ class MapSampleState extends State {
                   );
                   _is_first_tapped = false;
                   _is_second_tapped = false;
+                  _is_input_mode = false;
+                  _changeText();
                 }
               },
               myLocationEnabled: true,
@@ -221,16 +226,25 @@ class MapSampleState extends State {
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerFloat,
             floatingActionButton: FloatingActionButton.extended(
-              onPressed: _goToTheNagoyajo,
-              label: Text('To the ITF!'),
+              onPressed: (){
+                _is_input_mode = !_is_input_mode;
+                if(!_is_input_mode){
+                  _is_first_tapped = false;
+                  lats=[];
+                  lons=[];
+                }
+                _changeText();
+                },
+              label: Text(_message),
               icon: Icon(Icons.directions_bike),
             ),
           );
         });
   }
 
-  Future _goToTheNagoyajo() async {
-    final GoogleMapController controller = await _controller.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(_kITF));
+  void _changeText() {
+    setState(() {
+      _message = _is_input_mode ? '入力中止' : '道入力';
+    });
   }
 }
