@@ -5,6 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:roadstargram/markerDB.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -151,6 +152,7 @@ class MapSampleState extends State {
               onTap: (LatLng latLang) {
                 if (!_is_input_mode){
                 }else if (!_is_first_tapped && !_is_second_tapped) {
+                  Fluttertoast.showToast(msg: "終点を入力してください");
                   _is_first_tapped = true;
                   lons.add(latLang.longitude);
                   lats.add(latLang.latitude);
@@ -232,6 +234,8 @@ class MapSampleState extends State {
                   _is_first_tapped = false;
                   lats=[];
                   lons=[];
+                } else {
+                  Fluttertoast.showToast(msg: "始点を入力してください");
                 }
                 _changeText();
                 },
