@@ -42,10 +42,13 @@ class MapSample extends StatefulWidget {
 class MapSampleState extends State {
   Completer _controller = Completer();
   Set<Marker> _markers = {};
+  Set<Polyline>_polyline={};
   var num = 0;
-  bool _is_tapped = false;
+  bool _is_first_tapped = false;
+  bool _is_second_tapped = false;
   List<double> lats = [];
   List<double> lons = [];
+  List<LatLng> latlnglist = [];
   final markerStream =
       FirebaseFirestore.instance.collection('marker').snapshots();
   final MarkerDB markerDB = MarkerDB();
@@ -118,16 +121,28 @@ class MapSampleState extends State {
                 ));
               },
               onTap: (LatLng latLang) {
-                if (!_is_tapped) {
-                  _is_tapped = true;
+                if (!_is_first_tapped && !_is_second_tapped) {
+                  _is_first_tapped = true;
+                  latlnglist.add(latLang);
                   lons.add(latLang.longitude);
                   lats.add(latLang.latitude);
                   print(lons);
                   print(lats);
-                } else {
-                  _is_tapped = false;
+                } else if (_is_first_tapped && !_is_second_tapped) {
+                  _is_second_tapped = true;
+
+                  LatLng _lastMapPosition = latLang;
+                  latlnglist.add(latLang);
+                  lons.add(latLang.longitude);
+                  lats.add(latLang.latitude);
+                  print(lons);
+                  print(lats);
+                }else {
+                  _is_first_tapped = false;
+                  _is_second_tapped = false;
                   lons = [];
                   lats = [];
+                  latlnglist = [];
                   var _textController = TextEditingController();
                   showDialog(
                     context: context,
