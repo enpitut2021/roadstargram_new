@@ -78,6 +78,16 @@ class MapSampleState extends State {
     }
   }
 
+  Color getPolylineColor(int color) {
+    if (color == 1) {
+      return Colors.red; //good評価
+    } else if (color == 0) {
+      return Colors.green; //normal評価
+    } else {
+      return Colors.blue; //bad評価
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
@@ -104,7 +114,8 @@ class MapSampleState extends State {
                   visible: true,
                   //latlng is List<LatLng>
                   points: latLngList,
-                  color: Colors.blue,
+                  color: getPolylineColor(doc["goodDeg"]),
+                  width: 6,
                 );
               }).toSet() ??
                   Set<Polyline>(),
@@ -236,21 +247,4 @@ class MapSampleState extends State {
       _message = _is_input_mode ? '入力中止' : '道入力';
     });
   }
-
-  // Future _goToTheNagoyajo() async {
-  //   final GoogleMapController controller = await _controller.future;
-  //   controller.animateCamera(CameraUpdate.newCameraPosition(_kITF));
-  // }
-/*
-  void _onMapCreated(GoogleMapController controller) {
-    setState(() {
-      mapController = controller;
-      var options = MarkerOptions(
-          position: LatLng(35.6580339,139.7016358),
-          infoWindowText: InfoWindowText("タイトル", "説明分等")
-      );
-      mapController.addMarker(options);
-    });
-
-   */
 }
