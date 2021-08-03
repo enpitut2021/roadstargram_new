@@ -219,6 +219,8 @@ class MapSampleState extends State {
                 _is_input_mode = !_is_input_mode;
                 if(!_is_input_mode){
                   _is_first_tapped = false;
+                  lats=[];
+                  lons=[];
                 }
                 _changeText();
                 },
@@ -231,7 +233,7 @@ class MapSampleState extends State {
 
   void _changeText() {
     setState(() {
-      _message = _is_input_mode ? '入力中' : '道入力';
+      _message = _is_input_mode ? '入力中止' : '道入力';
     });
   }
 
