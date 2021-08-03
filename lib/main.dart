@@ -42,13 +42,11 @@ class MapSample extends StatefulWidget {
 class MapSampleState extends State {
   Completer _controller = Completer();
   Set<Marker> _markers = {};
-  Set<Polyline>_polyline={};
   var num = 0;
   bool _is_first_tapped = false;
   bool _is_second_tapped = false;
   List<double> lats = [];
   List<double> lons = [];
-  List<LatLng> latlnglist = [];
   final markerStream =
       FirebaseFirestore.instance.collection('markerTest').snapshots();
   final MarkerDB markerDB = MarkerDB();
@@ -140,30 +138,16 @@ class MapSampleState extends State {
               onTap: (LatLng latLang) {
                 if (!_is_first_tapped && !_is_second_tapped) {
                   _is_first_tapped = true;
-                  latlnglist.add(latLang);
                   lons.add(latLang.longitude);
                   lats.add(latLang.latitude);
                   print(lons);
                   print(lats);
                 } else if (_is_first_tapped && !_is_second_tapped) {
                   _is_second_tapped = true;
-                  LatLng _lastMapPosition = latLang;
-                  latlnglist.add(latLang);
                   lons.add(latLang.longitude);
                   lats.add(latLang.latitude);
                   print(lons);
                   print(lats);
-                  markerDB.addMarker(
-                      lats,
-                      lons,
-                      "aaa",
-                      -1);
-                }else {
-                  _is_first_tapped = false;
-                  _is_second_tapped = false;
-                  lons = [];
-                  lats = [];
-                  latlnglist = [];
                   var _textController = TextEditingController();
                   showDialog(
                     context: context,
@@ -184,8 +168,14 @@ class MapSampleState extends State {
                             child: Text("Good!!"),
                             onPressed: () {
                               Navigator.pop(context);
-                              markerDB.addMarker(latLang.latitude,
-                                  latLang.longitude, _textController.text, 1);
+                              markerDB.addMarker(
+                                  lats,
+                                  lons,
+                                  _textController.text,
+                                  1
+                              );
+                              lats = [];
+                              lons = [];
                               print('Clicked: $latLang, id: $num');
                               num = num + 1;
                             },
@@ -195,11 +185,14 @@ class MapSampleState extends State {
                             onPressed: () {
                               Navigator.pop(context);
                               markerDB.addMarker(
-                                  latLang.latitude,
-                                  latLang.longitude,
+                                  lats,
+                                  lons,
                                   _textController.text,
-                                  -1); //固定値でgood1
+                                  -1
+                              );
                               print('Clicked: $latLang, id: $num');
+                              lats=[];
+                              lons=[];
                               num = num + 1;
                             },
                           ),
@@ -207,6 +200,8 @@ class MapSampleState extends State {
                       );
                     },
                   );
+                  _is_first_tapped = false;
+                  _is_second_tapped = false;
                 }
               },
               myLocationEnabled: true,
