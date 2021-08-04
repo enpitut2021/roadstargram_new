@@ -152,6 +152,8 @@ class MapSampleState extends State {
               onTap: (LatLng latLang) {
                 if (!_is_input_mode){
                 }else if (!_is_first_tapped && !_is_second_tapped) {
+                  lats=[];
+                  lons=[];
                   Fluttertoast.showToast(msg: "終点を入力してください");
                   _is_first_tapped = true;
                   lons.add(latLang.longitude);
@@ -190,8 +192,6 @@ class MapSampleState extends State {
                                   _textController.text,
                                   1
                               );
-                              lats = [];
-                              lons = [];
                               print('Clicked: $latLang, id: $num');
                               num = num + 1;
                             },
@@ -207,8 +207,6 @@ class MapSampleState extends State {
                                   -1
                               );
                               print('Clicked: $latLang, id: $num');
-                              lats=[];
-                              lons=[];
                               num = num + 1;
                             },
                           ),
