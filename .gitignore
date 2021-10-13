@@ -77,3 +77,6 @@ ios/Runner/.env
 
 pubspec.lock
 ios/Podfile.lock
+ios/Podfile
+ios/Runner.xcodeproj/project.pbxproj
+ios/Runner.xcodeproj/xcshareddata
