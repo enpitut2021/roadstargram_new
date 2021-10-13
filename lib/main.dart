@@ -71,21 +71,21 @@ class MapSampleState extends State {
 
   double getMarkerColor(int color) {
     if (color == 1) {
-      return BitmapDescriptor.hueRed; //good評価
+      return BitmapDescriptor.hueBlue; //good評価
     } else if (color == 0) {
       return BitmapDescriptor.hueGreen; //normal評価
     } else {
-      return BitmapDescriptor.hueBlue; //bad評価
+      return BitmapDescriptor.hueRed; //bad評価
     }
   }
 
   Color getPolylineColor(int color) {
     if (color == 1) {
-      return Colors.red; //good評価
+      return Colors.blue; //good評価
     } else if (color == 0) {
       return Colors.green; //normal評価
     } else {
-      return Colors.blue; //bad評価
+      return Colors.red; //bad評価
     }
   }
 
