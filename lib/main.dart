@@ -181,7 +181,7 @@ class MapSampleState extends State {
                         content: TextField(
                           controller: _textController,
                           decoration: InputDecoration(
-                            hintText: '景色がキレイ',
+                            hintText: '#景色がキレイ #インスタ映え',
                           ),
                           autofocus: true,
                           // keyboardType: TextInputType.number,
