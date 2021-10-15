@@ -138,8 +138,8 @@ class MapSampleState extends State {
                       icon: BitmapDescriptor.defaultMarkerWithHue(
                           getMarkerColor(data["goodDeg"])),
                       infoWindow: InfoWindow(
-                          title: "${data["text"]}$hashtagStr",
-                          snippet: "いいね数：$iineNum",
+                          title: "${data["text"]}",
+                          snippet: "いいね数：$iineNum\n$hashtagStr",
                           onTap: () {
                             iineNum++;
                             print(iineNum);
