@@ -124,6 +124,12 @@ class MapSampleState extends State {
                     Map<String, dynamic> data =
                         doc.data() as Map<String, dynamic>;
                     int iineNum = data["iine"] ?? 0;
+                    String hashtagStr = "";
+                    if (data["hashtag"] != null){
+                      data["hashtag"]?.forEach((tag) {
+                        hashtagStr += " #$tag";
+                      });
+                    }
                     double latavg = (data["lat"][0] + data["lat"][1]) / 2.0;
                     double lonavg = (data["lon"][0] + data["lon"][1]) / 2.0;
                     return Marker(
@@ -132,7 +138,7 @@ class MapSampleState extends State {
                       icon: BitmapDescriptor.defaultMarkerWithHue(
                           getMarkerColor(data["goodDeg"])),
                       infoWindow: InfoWindow(
-                          title: data["text"],
+                          title: "${data["text"]}$hashtagStr",
                           snippet: "いいね数：$iineNum",
                           onTap: () {
                             iineNum++;
