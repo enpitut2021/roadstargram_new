@@ -127,7 +127,7 @@ class MapSampleState extends State {
                     String hashtagStr = "";
                     if (data["hashtag"] != null){
                       data["hashtag"]?.forEach((tag) {
-                        hashtagStr += " #$tag";
+                        hashtagStr += "#$tag ";
                       });
                     }
                     double latavg = (data["lat"][0] + data["lat"][1]) / 2.0;
@@ -195,8 +195,9 @@ class MapSampleState extends State {
                               markerDB.addMarker(
                                   lats,
                                   lons,
-                                  _textController.text,
-                                  1
+                                  _getNoHashTag(_textController.text),
+                                  1,
+                                  _getHashTag(_textController.text),
                               );
                               print('Clicked: $latLang, id: $num');
                               num = num + 1;
@@ -209,8 +210,9 @@ class MapSampleState extends State {
                               markerDB.addMarker(
                                   lats,
                                   lons,
-                                  _textController.text,
-                                  -1
+                                  _getNoHashTag(_textController.text),
+                                  -1,
+                                  _getHashTag(_textController.text),
                               );
                               print('Clicked: $latLang, id: $num');
                               num = num + 1;
@@ -254,5 +256,20 @@ class MapSampleState extends State {
     setState(() {
       _message = _is_input_mode ? '入力中止' : '道入力';
     });
+  }
+
+  String _getNoHashTag(String text) {
+    List<String> args = text.split("#");
+    return args[0].trimRight();
+  }
+
+  List<String> _getHashTag(String text) {
+    List<String> args = text.split("#");
+    List<String> hashtags = [];
+    for(int i=1; i<args.length; i++) {
+      if(args[i].isNotEmpty)
+        hashtags.add(args[i].trim());
+    }
+    return hashtags;
   }
 }
