@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:roadstargram/markerDB.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -91,6 +92,8 @@ class MapSampleState extends State {
 
   @override
   Widget build(BuildContext context) {
+
+
     return StreamBuilder<QuerySnapshot>(
         stream: markerStream,
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -101,7 +104,8 @@ class MapSampleState extends State {
             return CircularProgressIndicator();
           }
           return new Scaffold(
-            body: GoogleMap(
+            body: new Stack(children: [
+              GoogleMap(
               mapType: MapType.normal,
               initialCameraPosition: _kTsukubaStaion,
               polylines: snapshot.data?.docs.map((DocumentSnapshot doc) {
@@ -121,32 +125,32 @@ class MapSampleState extends State {
               }).toSet() ??
                   Set<Polyline>(),
               markers: snapshot.data?.docs.map((DocumentSnapshot doc) {
-                    Map<String, dynamic> data =
-                        doc.data() as Map<String, dynamic>;
-                    int iineNum = data["iine"] ?? 0;
-                    String hashtagStr = "";
-                    if (data["hashtag"] != null){
-                      data["hashtag"]?.forEach((tag) {
-                        hashtagStr += "#$tag ";
-                      });
-                    }
-                    double latavg = (data["lat"][0] + data["lat"][1]) / 2.0;
-                    double lonavg = (data["lon"][0] + data["lon"][1]) / 2.0;
-                    return Marker(
-                      markerId: MarkerId(doc.id),
-                      position: LatLng(latavg, lonavg),
-                      icon: BitmapDescriptor.defaultMarkerWithHue(
-                          getMarkerColor(data["goodDeg"])),
-                      infoWindow: InfoWindow(
-                          title: "${data["text"]}",
-                          snippet: "いいね数：$iineNum\n$hashtagStr",
-                          onTap: () {
-                            iineNum++;
-                            print(iineNum);
-                            markerDB.updateIine(doc.id, iineNum);
-                          }),
-                    );
-                  }).toSet() ??
+                Map<String, dynamic> data =
+                doc.data() as Map<String, dynamic>;
+                int iineNum = data["iine"] ?? 0;
+                String hashtagStr = "";
+                if (data["hashtag"] != null){
+                  data["hashtag"]?.forEach((tag) {
+                    hashtagStr += "#$tag ";
+                  });
+                }
+                double latavg = (data["lat"][0] + data["lat"][1]) / 2.0;
+                double lonavg = (data["lon"][0] + data["lon"][1]) / 2.0;
+                return Marker(
+                  markerId: MarkerId(doc.id),
+                  position: LatLng(latavg, lonavg),
+                  icon: BitmapDescriptor.defaultMarkerWithHue(
+                      getMarkerColor(data["goodDeg"])),
+                  infoWindow: InfoWindow(
+                      title: "${data["text"]}",
+                      snippet: "いいね数：$iineNum\n$hashtagStr",
+                      onTap: () {
+                        iineNum++;
+                        print(iineNum);
+                        markerDB.updateIine(doc.id, iineNum);
+                      }),
+                );
+              }).toSet() ??
                   Set<Marker>(),
               onMapCreated: (GoogleMapController controller) {
                 _controller.complete(controller);
@@ -193,11 +197,11 @@ class MapSampleState extends State {
                             onPressed: () {
                               Navigator.pop(context);
                               markerDB.addMarker(
-                                  lats,
-                                  lons,
-                                  _getNoHashTag(_textController.text),
-                                  1,
-                                  _getHashTag(_textController.text),
+                                lats,
+                                lons,
+                                _getNoHashTag(_textController.text),
+                                1,
+                                _getHashTag(_textController.text),
                               );
                               print('Clicked: $latLang, id: $num');
                               num = num + 1;
@@ -208,11 +212,11 @@ class MapSampleState extends State {
                             onPressed: () {
                               Navigator.pop(context);
                               markerDB.addMarker(
-                                  lats,
-                                  lons,
-                                  _getNoHashTag(_textController.text),
-                                  -1,
-                                  _getHashTag(_textController.text),
+                                lats,
+                                lons,
+                                _getNoHashTag(_textController.text),
+                                -1,
+                                _getHashTag(_textController.text),
                               );
                               print('Clicked: $latLang, id: $num');
                               num = num + 1;
@@ -231,6 +235,7 @@ class MapSampleState extends State {
               myLocationEnabled: true,
               myLocationButtonEnabled: true,
             ),
+              buildFloatingSearchBar()],),
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerFloat,
             floatingActionButton: FloatingActionButton.extended(
@@ -250,6 +255,55 @@ class MapSampleState extends State {
             ),
           );
         });
+  }
+
+  Widget buildFloatingSearchBar(){
+    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+
+    return FloatingSearchBar(
+      hint: 'Search...',
+      scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
+      transitionDuration: const Duration(milliseconds: 800),
+      transitionCurve: Curves.easeInOut,
+      physics: const BouncingScrollPhysics(),
+      axisAlignment: isPortrait ? 0.0 : -1.0,
+      openAxisAlignment: 0.0,
+      width: isPortrait ? 600 : 500,
+      debounceDelay: const Duration(milliseconds: 500),
+      onQueryChanged: (query) {
+        // Call your model, bloc, controller here.
+      },
+      // Specify a custom transition to be used for
+      // animating between opened and closed stated.
+      transition: CircularFloatingSearchBarTransition(),
+      actions: [
+        FloatingSearchBarAction(
+          showIfOpened: false,
+          child: CircularButton(
+            icon: const Icon(Icons.place),
+            onPressed: () {},
+          ),
+        ),
+        FloatingSearchBarAction.searchToClear(
+          showIfClosed: false,
+        ),
+      ],
+      builder: (context, transition) {
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Material(
+            color: Colors.white,
+            elevation: 4.0,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: Colors.accents.map((color) {
+                return Container(height: 112, color: color);
+              }).toList(),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   void _changeText() {
