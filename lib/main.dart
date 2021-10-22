@@ -51,6 +51,7 @@ class MapSampleState extends State {
   List<double> lats = [];
   List<double> lons = [];
   String _message = '道入力';
+  String _searchText = "";
   final markerStream =
       FirebaseFirestore.instance.collection('markerTest').snapshots();
   final MarkerDB markerDB = MarkerDB();
@@ -92,8 +93,6 @@ class MapSampleState extends State {
 
   @override
   Widget build(BuildContext context) {
-
-
     return StreamBuilder<QuerySnapshot>(
         stream: markerStream,
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -104,9 +103,10 @@ class MapSampleState extends State {
             return CircularProgressIndicator();
           }
           List<DocumentSnapshot> searchedDoc = [];
+          print(_searchText);
           snapshot.data?.docs.forEach((DocumentSnapshot doc) {
             Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-            if (data["hashtag"]?.contains("test") ?? false) {
+            if (_searchText == "" || (data["hashtag"]?.contains(_searchText) ?? false)) {
               searchedDoc.add(doc);
             }
           });
@@ -281,6 +281,11 @@ class MapSampleState extends State {
       // Specify a custom transition to be used for
       // animating between opened and closed stated.
       transition: CircularFloatingSearchBarTransition(),
+      onSubmitted: (query) {
+        this.setState(() {
+          _searchText = query;
+        });
+      },
       actions: [
         FloatingSearchBarAction(
           showIfOpened: false,
@@ -302,7 +307,7 @@ class MapSampleState extends State {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: Colors.accents.map((color) {
-                return Container(height: 112, color: color);
+                return Container(height: 0, color: color);
               }).toList(),
             ),
           ),
