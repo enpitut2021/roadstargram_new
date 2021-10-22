@@ -92,8 +92,6 @@ class MapSampleState extends State {
 
   @override
   Widget build(BuildContext context) {
-
-
     return StreamBuilder<QuerySnapshot>(
         stream: markerStream,
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -104,152 +102,155 @@ class MapSampleState extends State {
             return CircularProgressIndicator();
           }
           return new Scaffold(
-            body: new Stack(children: [
-              GoogleMap(
-              mapType: MapType.normal,
-              initialCameraPosition: _kTsukubaStaion,
-              polylines: snapshot.data?.docs.map((DocumentSnapshot doc) {
-                Map<String, dynamic> data =
-                doc.data() as Map<String, dynamic>;
-                List<LatLng> latLngList = [];
-                latLngList.add(LatLng(doc["lat"][0], doc["lon"][0]));
-                latLngList.add(LatLng(doc["lat"][1], doc["lon"][1]));
-                return Polyline(
-                  polylineId: PolylineId(doc.id),
-                  visible: true,
-                  //latlng is List<LatLng>
-                  points: latLngList,
-                  color: getPolylineColor(doc["goodDeg"]),
-                  width: 6,
-                );
-              }).toSet() ??
-                  Set<Polyline>(),
-              markers: snapshot.data?.docs.map((DocumentSnapshot doc) {
-                Map<String, dynamic> data =
-                doc.data() as Map<String, dynamic>;
-                int iineNum = data["iine"] ?? 0;
-                String hashtagStr = "";
-                if (data["hashtag"] != null){
-                  data["hashtag"]?.forEach((tag) {
-                    hashtagStr += "#$tag ";
-                  });
-                }
-                double latavg = (data["lat"][0] + data["lat"][1]) / 2.0;
-                double lonavg = (data["lon"][0] + data["lon"][1]) / 2.0;
-                return Marker(
-                  markerId: MarkerId(doc.id),
-                  position: LatLng(latavg, lonavg),
-                  icon: BitmapDescriptor.defaultMarkerWithHue(
-                      getMarkerColor(data["goodDeg"])),
-                  infoWindow: InfoWindow(
-                      title: "${data["text"]}",
-                      snippet: "いいね数：$iineNum\n$hashtagStr",
-                      onTap: () {
-                        iineNum++;
-                        print(iineNum);
-                        markerDB.updateIine(doc.id, iineNum);
-                      }),
-                );
-              }).toSet() ??
-                  Set<Marker>(),
-              onMapCreated: (GoogleMapController controller) {
-                _controller.complete(controller);
-                _markers.add(Marker(
-                  markerId: MarkerId('marker_ITF'),
-                  position: LatLng(36.10678749790326, 140.10190729280725),
-                ));
-              },
-              onTap: (LatLng latLang) {
-                if (!_is_input_mode){
-                }else if (!_is_first_tapped && !_is_second_tapped) {
-                  lats=[];
-                  lons=[];
-                  Fluttertoast.showToast(msg: "終点を入力してください");
-                  _is_first_tapped = true;
-                  lons.add(latLang.longitude);
-                  lats.add(latLang.latitude);
-                  print(lons);
-                  print(lats);
-                } else if (_is_first_tapped && !_is_second_tapped) {
-                  _is_second_tapped = true;
-                  lons.add(latLang.longitude);
-                  lats.add(latLang.latitude);
-                  print(lons);
-                  print(lats);
-                  var _textController = TextEditingController();
-                  showDialog(
-                    context: context,
-                    builder: (_) {
-                      return AlertDialog(
-                        title: Text("レビューを入力"),
-                        content: TextField(
-                          controller: _textController,
-                          decoration: InputDecoration(
-                            hintText: '#景色がキレイ #インスタ映え',
-                          ),
-                          autofocus: true,
-                          // keyboardType: TextInputType.number,
-                        ),
-                        actions: <Widget>[
-                          // ボタン領域
-                          FlatButton(
-                            child: Text("Good!!"),
-                            onPressed: () {
-                              Navigator.pop(context);
-                              markerDB.addMarker(
-                                lats,
-                                lons,
-                                _getNoHashTag(_textController.text),
-                                1,
-                                _getHashTag(_textController.text),
-                              );
-                              print('Clicked: $latLang, id: $num');
-                              num = num + 1;
-                            },
-                          ),
-                          FlatButton(
-                            child: Text("Bad"),
-                            onPressed: () {
-                              Navigator.pop(context);
-                              markerDB.addMarker(
-                                lats,
-                                lons,
-                                _getNoHashTag(_textController.text),
-                                -1,
-                                _getHashTag(_textController.text),
-                              );
-                              print('Clicked: $latLang, id: $num');
-                              num = num + 1;
-                            },
-                          ),
-                        ],
+            body: new Stack(
+              children: [
+                GoogleMap(
+                  mapType: MapType.normal,
+                  initialCameraPosition: _kTsukubaStaion,
+                  polylines: snapshot.data?.docs.map((DocumentSnapshot doc) {
+                        Map<String, dynamic> data =
+                            doc.data() as Map<String, dynamic>;
+                        List<LatLng> latLngList = [];
+                        latLngList.add(LatLng(doc["lat"][0], doc["lon"][0]));
+                        latLngList.add(LatLng(doc["lat"][1], doc["lon"][1]));
+                        return Polyline(
+                          polylineId: PolylineId(doc.id),
+                          visible: true,
+                          //latlng is List<LatLng>
+                          points: latLngList,
+                          color: getPolylineColor(doc["goodDeg"]),
+                          width: 6,
+                        );
+                      }).toSet() ??
+                      Set<Polyline>(),
+                  markers: snapshot.data?.docs.map((DocumentSnapshot doc) {
+                        Map<String, dynamic> data =
+                            doc.data() as Map<String, dynamic>;
+                        int iineNum = data["iine"] ?? 0;
+                        String hashtagStr = "";
+                        if (data["hashtag"] != null) {
+                          data["hashtag"]?.forEach((tag) {
+                            hashtagStr += "#$tag ";
+                          });
+                        }
+                        double latavg = (data["lat"][0] + data["lat"][1]) / 2.0;
+                        double lonavg = (data["lon"][0] + data["lon"][1]) / 2.0;
+                        return Marker(
+                          markerId: MarkerId(doc.id),
+                          position: LatLng(latavg, lonavg),
+                          icon: BitmapDescriptor.defaultMarkerWithHue(
+                              getMarkerColor(data["goodDeg"])),
+                          infoWindow: InfoWindow(
+                              title: "${data["text"]}",
+                              snippet: "いいね数：$iineNum\n$hashtagStr",
+                              onTap: () {
+                                iineNum++;
+                                print(iineNum);
+                                markerDB.updateIine(doc.id, iineNum);
+                              }),
+                        );
+                      }).toSet() ??
+                      Set<Marker>(),
+                  onMapCreated: (GoogleMapController controller) {
+                    _controller.complete(controller);
+                    _markers.add(Marker(
+                      markerId: MarkerId('marker_ITF'),
+                      position: LatLng(36.10678749790326, 140.10190729280725),
+                    ));
+                  },
+                  onTap: (LatLng latLang) {
+                    if (!_is_input_mode) {
+                    } else if (!_is_first_tapped && !_is_second_tapped) {
+                      lats = [];
+                      lons = [];
+                      Fluttertoast.showToast(msg: "終点を入力してください");
+                      _is_first_tapped = true;
+                      lons.add(latLang.longitude);
+                      lats.add(latLang.latitude);
+                      print(lons);
+                      print(lats);
+                    } else if (_is_first_tapped && !_is_second_tapped) {
+                      _is_second_tapped = true;
+                      lons.add(latLang.longitude);
+                      lats.add(latLang.latitude);
+                      print(lons);
+                      print(lats);
+                      var _textController = TextEditingController();
+                      showDialog(
+                        context: context,
+                        builder: (_) {
+                          return AlertDialog(
+                            title: Text("レビューを入力"),
+                            content: TextField(
+                              controller: _textController,
+                              decoration: InputDecoration(
+                                hintText: '#景色がキレイ #インスタ映え',
+                              ),
+                              autofocus: true,
+                              // keyboardType: TextInputType.number,
+                            ),
+                            actions: <Widget>[
+                              // ボタン領域
+                              FlatButton(
+                                child: Text("Good!!"),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  markerDB.addMarker(
+                                    lats,
+                                    lons,
+                                    _getNoHashTag(_textController.text),
+                                    1,
+                                    _getHashTag(_textController.text),
+                                  );
+                                  print('Clicked: $latLang, id: $num');
+                                  num = num + 1;
+                                },
+                              ),
+                              FlatButton(
+                                child: Text("Bad"),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  markerDB.addMarker(
+                                    lats,
+                                    lons,
+                                    _getNoHashTag(_textController.text),
+                                    -1,
+                                    _getHashTag(_textController.text),
+                                  );
+                                  print('Clicked: $latLang, id: $num');
+                                  num = num + 1;
+                                },
+                              ),
+                            ],
+                          );
+                        },
                       );
-                    },
-                  );
-                  _is_first_tapped = false;
-                  _is_second_tapped = false;
-                  _is_input_mode = false;
-                  _changeText();
-                }
-              },
-              myLocationEnabled: true,
-              myLocationButtonEnabled: true,
+                      _is_first_tapped = false;
+                      _is_second_tapped = false;
+                      _is_input_mode = false;
+                      _changeText();
+                    }
+                  },
+                  myLocationEnabled: true,
+                  myLocationButtonEnabled: true,
+                ),
+                buildFloatingSearchBar()
+              ],
             ),
-              buildFloatingSearchBar()],),
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerFloat,
             floatingActionButton: FloatingActionButton.extended(
-              onPressed: (){
+              onPressed: () {
                 _is_input_mode = !_is_input_mode;
-                if(!_is_input_mode){
+                if (!_is_input_mode) {
                   _is_first_tapped = false;
-                  lats=[];
-                  lons=[];
+                  lats = [];
+                  lons = [];
                 } else {
                   Fluttertoast.showToast(msg: "始点を入力してください");
                 }
                 _changeText();
-                },
+              },
               label: Text(_message),
               icon: Icon(Icons.directions_bike),
             ),
@@ -257,8 +258,9 @@ class MapSampleState extends State {
         });
   }
 
-  Widget buildFloatingSearchBar(){
-    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+  Widget buildFloatingSearchBar() {
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
 
     return FloatingSearchBar(
       hint: 'Search...',
@@ -272,10 +274,14 @@ class MapSampleState extends State {
       debounceDelay: const Duration(milliseconds: 500),
       onQueryChanged: (query) {
         // Call your model, bloc, controller here.
+        //print(query);
       },
       // Specify a custom transition to be used for
       // animating between opened and closed stated.
       transition: CircularFloatingSearchBarTransition(),
+      onSubmitted: (query) {
+        print(query);
+      },
       actions: [
         FloatingSearchBarAction(
           showIfOpened: false,
@@ -297,7 +303,7 @@ class MapSampleState extends State {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: Colors.accents.map((color) {
-                return Container(height: 112, color: color);
+                return Container(height: 0, color: Colors.white);
               }).toList(),
             ),
           ),
@@ -320,9 +326,8 @@ class MapSampleState extends State {
   List<String> _getHashTag(String text) {
     List<String> args = text.split("#");
     List<String> hashtags = [];
-    for(int i=1; i<args.length; i++) {
-      if(args[i].isNotEmpty)
-        hashtags.add(args[i].trim());
+    for (int i = 1; i < args.length; i++) {
+      if (args[i].isNotEmpty) hashtags.add(args[i].trim());
     }
     return hashtags;
   }
