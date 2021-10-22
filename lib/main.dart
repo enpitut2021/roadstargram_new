@@ -103,12 +103,19 @@ class MapSampleState extends State {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return CircularProgressIndicator();
           }
+          List<DocumentSnapshot> searchedDoc = [];
+          snapshot.data?.docs.forEach((DocumentSnapshot doc) {
+            Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+            if (data["hashtag"]?.contains("test") ?? false) {
+              searchedDoc.add(doc);
+            }
+          });
           return new Scaffold(
             body: new Stack(children: [
               GoogleMap(
               mapType: MapType.normal,
               initialCameraPosition: _kTsukubaStaion,
-              polylines: snapshot.data?.docs.map((DocumentSnapshot doc) {
+              polylines: searchedDoc.map((DocumentSnapshot doc) {
                 Map<String, dynamic> data =
                 doc.data() as Map<String, dynamic>;
                 List<LatLng> latLngList = [];
@@ -122,9 +129,8 @@ class MapSampleState extends State {
                   color: getPolylineColor(doc["goodDeg"]),
                   width: 6,
                 );
-              }).toSet() ??
-                  Set<Polyline>(),
-              markers: snapshot.data?.docs.map((DocumentSnapshot doc) {
+              }).toSet(),
+              markers: searchedDoc.map((DocumentSnapshot doc) {
                 Map<String, dynamic> data =
                 doc.data() as Map<String, dynamic>;
                 int iineNum = data["iine"] ?? 0;
@@ -150,8 +156,7 @@ class MapSampleState extends State {
                         markerDB.updateIine(doc.id, iineNum);
                       }),
                 );
-              }).toSet() ??
-                  Set<Marker>(),
+              }).toSet(),
               onMapCreated: (GoogleMapController controller) {
                 _controller.complete(controller);
                 _markers.add(Marker(
