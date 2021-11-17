@@ -58,6 +58,8 @@ class MapSampleState extends State {
   var _pin_info_iine = 0;
   var _pin_info_docid = "";
   late BitmapDescriptor pinLocationIcon;
+  List<DropdownMenuItem<int>> _items = [];
+  int _selectItem = 0;
   final markerStream =
       FirebaseFirestore.instance.collection('markerTest').snapshots();
   final MarkerDB markerDB = MarkerDB();
@@ -66,6 +68,24 @@ class MapSampleState extends State {
   void initState(){
     super.initState();
     setCustomMapPin();
+    setItems();
+    _selectItem = _items[0].value!;
+  }
+
+  void setItems() {
+    _items
+      ..add(DropdownMenuItem(
+        child: Text('A', style: TextStyle(fontSize: 40.0),),
+        value: 1,
+      ))
+      ..add(DropdownMenuItem(
+        child: Text('B', style: TextStyle(fontSize: 40.0),),
+        value: 2,
+      ))
+      ..add(DropdownMenuItem(
+        child: Text('C', style: TextStyle(fontSize: 40.0),),
+        value: 3,
+      ));
   }
 
   static final CameraPosition _kTsukubaStaion = CameraPosition(
@@ -213,13 +233,28 @@ class MapSampleState extends State {
                         builder: (_) {
                           return AlertDialog(
                             title: Text("レビューを入力"),
-                            content: TextField(
-                              controller: _textController,
-                              decoration: InputDecoration(
-                                hintText: '#景色がキレイ #インスタ映え',
+                            content: Expanded(
+                              child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                TextField(
+                                controller: _textController,
+                                decoration: InputDecoration(
+                                  hintText: '#景色がキレイ #インスタ映え',
+                                ),
+                                autofocus: true,
+                                // keyboardType: TextInputType.number,
                               ),
-                              autofocus: true,
-                              // keyboardType: TextInputType.number,
+                                DropdownButton(
+                                  items: _items,
+                                  value: _selectItem,
+                                  onChanged: (int? value) => {
+                                    setState(() {
+                                      _selectItem = value!;
+                                    }),
+                                  },
+                                ),
+                              ]),
                             ),
                             actions: <Widget>[
                               // ボタン領域
