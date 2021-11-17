@@ -57,9 +57,16 @@ class MapSampleState extends State {
   String _pin_info_hashtag = "hashtag";
   var _pin_info_iine = 0;
   var _pin_info_docid = "";
+  late BitmapDescriptor pinLocationIcon;
   final markerStream =
       FirebaseFirestore.instance.collection('markerTest').snapshots();
   final MarkerDB markerDB = MarkerDB();
+
+  @override
+  void initState(){
+    super.initState();
+    setCustomMapPin();
+  }
 
   static final CameraPosition _kTsukubaStaion = CameraPosition(
     //TsukubaStation
@@ -152,8 +159,9 @@ class MapSampleState extends State {
                     return Marker(
                         markerId: MarkerId(doc.id),
                         position: LatLng(latavg, lonavg),
-                        icon: BitmapDescriptor.defaultMarkerWithHue(
-                            getMarkerColor(data["goodDeg"])),
+                        icon: (pinLocationIcon),
+                        // icon: BitmapDescriptor.defaultMarkerWithHue(
+                        //     getMarkerColor(data["goodDeg"])),
                         // infoWindow: InfoWindow(
                         //     title: "${data["text"]}",
                         //     snippet: "いいね数：$iineNum\n$hashtagStr",
@@ -407,5 +415,10 @@ class MapSampleState extends State {
       if (args[i].isNotEmpty) hashtags.add(args[i].trim());
     }
     return hashtags;
+  }
+
+  void setCustomMapPin() async {
+    pinLocationIcon = await BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(devicePixelRatio: 1), 'assets/mountain.png');
   }
 }
