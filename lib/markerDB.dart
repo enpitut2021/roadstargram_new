@@ -15,7 +15,7 @@ class MarkerDB {
     marker = FirebaseFirestore.instance.collection('markerTest');
   }
 
-  Future<void> addMarker(lat, lon, text, goodDeg, hashtag, {iine = 0}) {
+  Future<void> addMarker(lat, lon, text, goodDeg, hashtag, {iine = 0, icon = 'car'}) {
     return marker.add({
       'lat': lat,
       'lon': lon,
@@ -23,6 +23,7 @@ class MarkerDB {
       'goodDeg':goodDeg,
       'hashtag': hashtag, //1:good,0:soso,-1:bad
       'iine': iine,
+      'icon': icon,
     })
     .then((value) => {
       print("Marker added: ${value.id}")

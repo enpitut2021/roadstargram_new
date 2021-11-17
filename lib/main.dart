@@ -233,6 +233,7 @@ class MapSampleState extends State {
                                     _getNoHashTag(_textController.text),
                                     1,
                                     _getHashTag(_textController.text),
+                                    icon: "car",
                                   );
                                   print('Clicked: $latLang, id: $num');
                                   num = num + 1;
@@ -248,6 +249,7 @@ class MapSampleState extends State {
                                     _getNoHashTag(_textController.text),
                                     -1,
                                     _getHashTag(_textController.text),
+                                    icon: "car",
                                   );
                                   print('Clicked: $latLang, id: $num');
                                   num = num + 1;
