@@ -75,16 +75,24 @@ class MapSampleState extends State {
   void setItems() {
     _items
       ..add(DropdownMenuItem(
-        child: Text('A', style: TextStyle(fontSize: 40.0),),
+        child: Text('景色', style: TextStyle(fontSize: 40.0),),
         value: 1,
       ))
       ..add(DropdownMenuItem(
-        child: Text('B', style: TextStyle(fontSize: 40.0),),
+        child: Text('食べ物', style: TextStyle(fontSize: 40.0),),
         value: 2,
       ))
       ..add(DropdownMenuItem(
-        child: Text('C', style: TextStyle(fontSize: 40.0),),
+        child: Text('道', style: TextStyle(fontSize: 40.0),),
         value: 3,
+      ))
+      ..add(DropdownMenuItem(
+        child: Text('交通', style: TextStyle(fontSize: 40.0),),
+        value: 4,
+      ))
+      ..add(DropdownMenuItem(
+        child: Text('歩行者', style: TextStyle(fontSize: 40.0),),
+        value: 5,
       ));
   }
 
