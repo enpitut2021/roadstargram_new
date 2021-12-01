@@ -7,6 +7,7 @@ import 'package:roadstargram/markerDB.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:roadstargram/postPage.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -200,55 +201,58 @@ class MapSampleState extends State {
                       print(lons);
                       print(lats);
                       var _textController = TextEditingController();
-                      showDialog(
-                        context: context,
-                        builder: (_) {
-                          return AlertDialog(
-                            title: Text("レビューを入力"),
-                            content: TextField(
-                              controller: _textController,
-                              decoration: InputDecoration(
-                                hintText: '#景色がキレイ #インスタ映え',
-                              ),
-                              autofocus: true,
-                              // keyboardType: TextInputType.number,
-                            ),
-                            actions: <Widget>[
-                              // ボタン領域
-                              FlatButton(
-                                child: Text("Good!!"),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                  markerDB.addMarker(
-                                    lats,
-                                    lons,
-                                    _getNoHashTag(_textController.text),
-                                    1,
-                                    _getHashTag(_textController.text),
-                                  );
-                                  print('Clicked: $latLang, id: $num');
-                                  num = num + 1;
-                                },
-                              ),
-                              FlatButton(
-                                child: Text("Bad"),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                  markerDB.addMarker(
-                                    lats,
-                                    lons,
-                                    _getNoHashTag(_textController.text),
-                                    -1,
-                                    _getHashTag(_textController.text),
-                                  );
-                                  print('Clicked: $latLang, id: $num');
-                                  num = num + 1;
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      );
+                      Navigator.push(context, MaterialPageRoute(
+                          builder: (context) => PostPage(lats, lons)
+                      ));
+                      // showDialog(
+                      //   context: context,
+                      //   builder: (_) {
+                      //     return AlertDialog(
+                      //       title: Text("レビューを入力"),
+                      //       content: TextField(
+                      //         controller: _textController,
+                      //         decoration: InputDecoration(
+                      //           hintText: '#景色がキレイ #インスタ映え',
+                      //         ),
+                      //         autofocus: true,
+                      //         // keyboardType: TextInputType.number,
+                      //       ),
+                      //       actions: <Widget>[
+                      //         // ボタン領域
+                      //         FlatButton(
+                      //           child: Text("Good!!"),
+                      //           onPressed: () {
+                      //             Navigator.pop(context);
+                      //             markerDB.addMarker(
+                      //               lats,
+                      //               lons,
+                      //               _getNoHashTag(_textController.text),
+                      //               1,
+                      //               _getHashTag(_textController.text),
+                      //             );
+                      //             print('Clicked: $latLang, id: $num');
+                      //             num = num + 1;
+                      //           },
+                      //         ),
+                      //         FlatButton(
+                      //           child: Text("Bad"),
+                      //           onPressed: () {
+                      //             Navigator.pop(context);
+                      //             markerDB.addMarker(
+                      //               lats,
+                      //               lons,
+                      //               _getNoHashTag(_textController.text),
+                      //               -1,
+                      //               _getHashTag(_textController.text),
+                      //             );
+                      //             print('Clicked: $latLang, id: $num');
+                      //             num = num + 1;
+                      //           },
+                      //         ),
+                      //       ],
+                      //     );
+                      //   },
+                      // );
                       _is_first_tapped = false;
                       _is_second_tapped = false;
                       _is_input_mode = false;
