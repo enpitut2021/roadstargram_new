@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:roadstargram/markerDB.dart';
 
-enum RadioValue { GOOD, BAD }
-
 class PostPage extends StatefulWidget {
   final List<double> lats, lons;
   const PostPage(this.lats, this.lons);
@@ -13,7 +11,7 @@ class PostPage extends StatefulWidget {
 
 class _PostPageState extends State<PostPage> {
   var _textController = TextEditingController();
-  RadioValue _type = RadioValue.GOOD;
+  int _type = 1;
   var markerDB = MarkerDB();
 
   _handleRadio(value) {
@@ -42,8 +40,8 @@ class _PostPageState extends State<PostPage> {
               activeColor: Colors.blue,
               controlAffinity: ListTileControlAffinity.trailing,
               title: Text('Good'),
-              subtitle: Text('Goodアイコンの表示'),
-              value: RadioValue.GOOD,
+              subtitle: Text('いいね！'),
+              value: 1,
               groupValue: _type,
               onChanged: _handleRadio,
             ),
@@ -52,8 +50,8 @@ class _PostPageState extends State<PostPage> {
               activeColor: Colors.blue,
               controlAffinity: ListTileControlAffinity.trailing,
               title: Text('Bad'),
-              subtitle: Text('Favoriteアイコンの表示'),
-              value: RadioValue.BAD,
+              subtitle: Text('微妙...'),
+              value: -1,
               groupValue: _type,
               onChanged: _handleRadio,
             ),
@@ -64,7 +62,7 @@ class _PostPageState extends State<PostPage> {
                   widget.lats,
                   widget.lons,
                   _getNoHashTag(_textController.text),
-                  1,
+                  _type,
                   _getHashTag(_textController.text),
                 );
                 Navigator.pop(context);
