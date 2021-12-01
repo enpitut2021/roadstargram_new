@@ -80,3 +80,6 @@ ios/Podfile.lock
 ios/Podfile
 ios/Runner.xcodeproj/project.pbxproj
 ios/Runner.xcodeproj/xcshareddata
+
+ios/GoogleService-Info.plist
+ios/Runner/GoogleService-Info.plist
