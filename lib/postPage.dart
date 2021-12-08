@@ -13,10 +13,6 @@ class _PostPageState extends State<PostPage> {
   var _textController = TextEditingController();
   int _type = 1;
   var markerDB = MarkerDB();
-  String? _selectSeason = null;
-  String? _selectTime = null;
-  String? _selectWho = null;
-  String? _selectWeather = null;
 
   @override
   void initState() {
@@ -72,11 +68,10 @@ class _PostPageState extends State<PostPage> {
                 //   }
                 // ),
                 DropdownButton<String>(
-                  value: _selectSeason,
                   hint: new Text("季節"),
                   onChanged: (String? value) => {
                     setState(() {
-                      _selectTime = value!;
+                      _textController.text += '#' + value!;
                     }),
                   },
                   items: <String>['春', '夏', '秋', '冬']
@@ -88,11 +83,10 @@ class _PostPageState extends State<PostPage> {
                   }).toList(),
                 ),
                 DropdownButton<String>(
-                  value: _selectWeather,
                   hint: new Text("天候"),
                   onChanged: (String? value) => {
                     setState(() {
-                      _selectWeather = value!;
+                      _textController.text += '#' + value!;
                     }),
                   },
                   items: <String>['晴れ', '雨', '曇り', '雪']
@@ -104,11 +98,10 @@ class _PostPageState extends State<PostPage> {
                   }).toList(),
                 ),
                 DropdownButton<String>(
-                  value: _selectTime,
                   hint: new Text("時間帯"),
                   onChanged: (String? value) => {
                     setState(() {
-                      _selectTime = value!;
+                      _textController.text += '#' + value!;
                     }),
                   },
                   items: <String>['早朝', '朝', '昼', '夜', '深夜']
@@ -120,11 +113,10 @@ class _PostPageState extends State<PostPage> {
                   }).toList(),
                 ),
                 DropdownButton<String>(
-                  value: _selectWho,
                   hint: new Text("誰と"),
                   onChanged: (String? value) => {
                     setState(() {
-                      _selectWho = value!;
+                      _textController.text += '#' + value!;
                     }),
                   },
                   items: <String>['1人', '友達', '家族', '恋人']
