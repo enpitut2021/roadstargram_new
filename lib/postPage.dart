@@ -30,139 +30,142 @@ class _PostPageState extends State<PostPage> {
           title : Text("道のレビューを追加")
       ),
       body : Center(
-        child: Column(
-          children: [
-            TextField(
-              controller: _textController,
-              decoration: InputDecoration(
-                hintText: '#景色がキレイ #インスタ映え',
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            children: [
+              TextField(
+                controller: _textController,
+                decoration: InputDecoration(
+                  hintText: '#景色がキレイ #インスタ映え',
+                ),
+                autofocus: true,
+                // keyboardType: TextInputType.number,
               ),
-              autofocus: true,
-              // keyboardType: TextInputType.number,
-            ),
-            Row(
-              children: [
-                // ElevatedButton(
-                //   child: Text("季節"),
-                //   onPressed: () {
-                //     showDialog(
-                //       context: context,
-                //         builder: (_) {
-                //            return AlertDialog(
-                //              title: Text("レビューを入力"),
-                //              content: SingleChildScrollView(
-                //               child: ListTileTheme(
-                //                 contentPadding: EdgeInsets.fromLTRB(14.0, 0.0, 24.0, 0.0),
-                //                 child: ListBody(
-                //                   children: [
-                //                     MultiSelectDialog(
-                //                       items:
-                //                     )
-                //                   ],
-                //                 ),
-                //               ),
-                //            ),
-                //            );
-                //          }
-                //     );
-                //   }
-                // ),
-                DropdownButton<String>(
-                  hint: new Text("季節"),
-                  onChanged: (String? value) => {
-                    setState(() {
-                      _textController.text += '#' + value!;
-                    }),
-                  },
-                  items: <String>['春', '夏', '秋', '冬']
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-                DropdownButton<String>(
-                  hint: new Text("天候"),
-                  onChanged: (String? value) => {
-                    setState(() {
-                      _textController.text += '#' + value!;
-                    }),
-                  },
-                  items: <String>['晴れ', '雨', '曇り', '雪']
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-                DropdownButton<String>(
-                  hint: new Text("時間帯"),
-                  onChanged: (String? value) => {
-                    setState(() {
-                      _textController.text += '#' + value!;
-                    }),
-                  },
-                  items: <String>['早朝', '朝', '昼', '夜', '深夜']
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-                DropdownButton<String>(
-                  hint: new Text("誰と"),
-                  onChanged: (String? value) => {
-                    setState(() {
-                      _textController.text += '#' + value!;
-                    }),
-                  },
-                  items: <String>['1人', '友達', '家族', '恋人']
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
-            new RadioListTile(
-              secondary: Icon(Icons.thumb_up),
-              activeColor: Colors.blue,
-              controlAffinity: ListTileControlAffinity.trailing,
-              title: Text('Good'),
-              subtitle: Text('いいね！'),
-              value: 1,
-              groupValue: _type,
-              onChanged: _handleRadio,
-            ),
-            new RadioListTile(
-              secondary: Icon(Icons.thumb_down),
-              activeColor: Colors.blue,
-              controlAffinity: ListTileControlAffinity.trailing,
-              title: Text('Bad'),
-              subtitle: Text('微妙...'),
-              value: -1,
-              groupValue: _type,
-              onChanged: _handleRadio,
-            ),
-            ElevatedButton(
-              child: Text("レビューを投稿する"),
-              onPressed: (){
-                markerDB.addMarker(
-                  widget.lats,
-                  widget.lons,
-                  _getNoHashTag(_textController.text),
-                  _type,
-                  _getHashTag(_textController.text),
-                );
-                Navigator.pop(context);
-              },
-            )
-          ],
+              Row(
+                children: [
+                  // ElevatedButton(
+                  //   child: Text("季節"),
+                  //   onPressed: () {
+                  //     showDialog(
+                  //       context: context,
+                  //         builder: (_) {
+                  //            return AlertDialog(
+                  //              title: Text("レビューを入力"),
+                  //              content: SingleChildScrollView(
+                  //               child: ListTileTheme(
+                  //                 contentPadding: EdgeInsets.fromLTRB(14.0, 0.0, 24.0, 0.0),
+                  //                 child: ListBody(
+                  //                   children: [
+                  //                     MultiSelectDialog(
+                  //                       items:
+                  //                     )
+                  //                   ],
+                  //                 ),
+                  //               ),
+                  //            ),
+                  //            );
+                  //          }
+                  //     );
+                  //   }
+                  // ),
+                  DropdownButton<String>(
+                    hint: new Text("季節"),
+                    onChanged: (String? value) => {
+                      setState(() {
+                        _textController.text += '#' + value!;
+                      }),
+                    },
+                    items: <String>['春', '夏', '秋', '冬']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                  DropdownButton<String>(
+                    hint: new Text("天候"),
+                    onChanged: (String? value) => {
+                      setState(() {
+                        _textController.text += '#' + value!;
+                      }),
+                    },
+                    items: <String>['晴れ', '雨', '曇り', '雪']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                  DropdownButton<String>(
+                    hint: new Text("時間帯"),
+                    onChanged: (String? value) => {
+                      setState(() {
+                        _textController.text += '#' + value!;
+                      }),
+                    },
+                    items: <String>['早朝', '朝', '昼', '夜', '深夜']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                  DropdownButton<String>(
+                    hint: new Text("誰と"),
+                    onChanged: (String? value) => {
+                      setState(() {
+                        _textController.text += '#' + value!;
+                      }),
+                    },
+                    items: <String>['1人', '友達', '家族', '恋人']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+              new RadioListTile(
+                secondary: Icon(Icons.thumb_up),
+                activeColor: Colors.blue,
+                controlAffinity: ListTileControlAffinity.trailing,
+                title: Text('Good'),
+                subtitle: Text('いいね！'),
+                value: 1,
+                groupValue: _type,
+                onChanged: _handleRadio,
+              ),
+              new RadioListTile(
+                secondary: Icon(Icons.thumb_down),
+                activeColor: Colors.blue,
+                controlAffinity: ListTileControlAffinity.trailing,
+                title: Text('Bad'),
+                subtitle: Text('微妙...'),
+                value: -1,
+                groupValue: _type,
+                onChanged: _handleRadio,
+              ),
+              ElevatedButton(
+                child: Text("レビューを投稿する"),
+                onPressed: (){
+                  markerDB.addMarker(
+                    widget.lats,
+                    widget.lons,
+                    _getNoHashTag(_textController.text),
+                    _type,
+                    _getHashTag(_textController.text),
+                  );
+                  Navigator.pop(context);
+                },
+              )
+            ],
+          ),
         ),
       ),
     );
