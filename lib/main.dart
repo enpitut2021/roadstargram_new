@@ -353,6 +353,7 @@ class MapSampleState extends State {
       width: isPortrait ? 600 : 500,
       debounceDelay: const Duration(milliseconds: 500),
       onQueryChanged: (query) {
+        _searchText = query;
         // Call your model, bloc, controller here.
       },
       // Specify a custom transition to be used for
@@ -381,15 +382,47 @@ class MapSampleState extends State {
           child: Material(
             color: Colors.white,
             elevation: 4.0,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: Colors.accents.map((color) {
-                return Container(height: 0, color: color);
-              }).toList(),
-            ),
+            child: search_recommend(_searchText),
           ),
         );
       },
+    );
+  }
+
+  Widget search_recommend(_searchText) {
+    List<String> hashtags = [
+      '春', '夏', '秋', '冬',
+      '晴れ', '雨', '曇り', '雪',
+      '早朝', '朝', '昼', '夜', '深夜',
+      '1人', '友達', '家族', '恋人',
+    ];
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children:
+            hashtags.map((h) {
+              return ListTile(
+                title: Text(h),
+                onTap: () {
+                  print(h);
+                  _searchText += h;
+                }
+              );
+            }).toList()
+
+            // ListView.builder(
+            //   itemCount: 10,
+            //   itemBuilder: (context, index) {
+            //     print('build $index');
+            //
+            //     return Container(
+            //       color: Colors.white,
+            //       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            //       child: Text(
+            //         hashtags[index],
+            //       ),
+            //     );
+            //   },
+            // ),
     );
   }
 
