@@ -71,8 +71,10 @@ app.*.map.json
 **/ios/Flutter/flutter_export_environment.sh
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
-
-
+**/ios/Runner.xcworkspace/contents.xcworkspacedata
+**/ios/Runner/Info.plist
+**/android/app/src/main/kotlin/com/
+**/web/
 ios/Runner/.env
 
 pubspec.lock
@@ -82,4 +84,5 @@ ios/Runner.xcodeproj/project.pbxproj
 ios/Runner.xcodeproj/xcshareddata
 
 ios/GoogleService-Info.plist
+**/ios/Runner/GoogleService-Info.plist
 ios/Runner/GoogleService-Info.plist
