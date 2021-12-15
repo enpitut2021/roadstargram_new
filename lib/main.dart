@@ -61,6 +61,7 @@ class MapSampleState extends State {
   final markerStream =
       FirebaseFirestore.instance.collection('markerTest').snapshots();
   final MarkerDB markerDB = MarkerDB();
+  FloatingSearchBarController controller = FloatingSearchBarController();
 
   static final CameraPosition _kTsukubaStaion = CameraPosition(
     //TsukubaStation
@@ -341,6 +342,7 @@ class MapSampleState extends State {
   Widget buildFloatingSearchBar() {
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
+    //FloatingSearchBarController controller = FloatingSearchBarController();
 
     return FloatingSearchBar(
       hint: 'Search...',
@@ -351,6 +353,7 @@ class MapSampleState extends State {
       axisAlignment: isPortrait ? 0.0 : -1.0,
       openAxisAlignment: 0.0,
       width: isPortrait ? 600 : 500,
+      controller: controller,
       debounceDelay: const Duration(milliseconds: 500),
       onQueryChanged: (query) {
         _searchText = query;
@@ -382,14 +385,14 @@ class MapSampleState extends State {
           child: Material(
             color: Colors.white,
             elevation: 4.0,
-            child: search_recommend(_searchText),
+            child: search_recommend(),
           ),
         );
       },
     );
   }
 
-  Widget search_recommend(_searchText) {
+  Widget search_recommend() {
     List<String> hashtags = [
       '春', '夏', '秋', '冬',
       '晴れ', '雨', '曇り', '雪',
@@ -404,7 +407,14 @@ class MapSampleState extends State {
                 title: Text(h),
                 onTap: () {
                   print(h);
-                  _searchText += h;
+                  this.setState(() {
+                    _searchText = h;
+                    controller.close();
+                  });
+
+
+                  // _searchText += h;
+
                 }
               );
             }).toList()
