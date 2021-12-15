@@ -365,6 +365,7 @@ class MapSampleState extends State {
       onSubmitted: (query) {
         this.setState(() {
           _searchText = query;
+          controller.close();
         });
       },
       actions: [
@@ -394,7 +395,7 @@ class MapSampleState extends State {
 
   Widget search_recommend() {
     List<String> hashtags = [
-      '春', '夏', '秋', '冬',
+      'リセットしますか？','春', '夏', '秋', '冬',
       '晴れ', '雨', '曇り', '雪',
       '早朝', '朝', '昼', '夜', '深夜',
       '1人', '友達', '家族', '恋人',
@@ -407,12 +408,19 @@ class MapSampleState extends State {
                 title: Text(h),
                 onTap: () {
                   print(h);
-                  this.setState(() {
-                    _searchText = h;
-                    controller.close();
-                  });
-
-
+                  if (h == hashtags[0]) {
+                    //リセットする
+                    this.setState(() {
+                      _searchText = "";
+                      controller.close();
+                    });
+                  }
+                  else {
+                    this.setState(() {
+                      _searchText = h;
+                      controller.close();
+                    });
+                  }
                   // _searchText += h;
 
                 }
