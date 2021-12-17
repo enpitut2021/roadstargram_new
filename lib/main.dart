@@ -326,7 +326,7 @@ class MapSampleState extends State<MapSample> {
                                     child: Align(
                                       alignment: Alignment.centerLeft,
                                       child: ElevatedButton(
-                                        child: Text('ストリートビュー'),
+                                        child: Text('Go to GoogleMap'),
                                         style: ElevatedButton.styleFrom(
                                           primary: Colors.lightBlue,
                                           onPrimary: Colors.black,
@@ -334,7 +334,7 @@ class MapSampleState extends State<MapSample> {
                                         ),
                                         onPressed: () async {
                                           final url =
-                                              'https://www.google.com/maps/search/?api=1&query=${_streetview_lat},${_streetview_lon}&map_action=pano&parameters';
+                                              'https://www.google.com/maps/search/?api=1&query=${_streetview_lat},${_streetview_lon}';
                                           if (await canLaunch(url)) {
                                             launch(url, forceSafariVC: false);
                                           }
