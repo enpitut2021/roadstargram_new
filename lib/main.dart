@@ -8,6 +8,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:roadstargram/postPage.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,7 +43,7 @@ class MapSample extends StatefulWidget {
   State createState() => MapSampleState();
 }
 
-class MapSampleState extends State {
+class MapSampleState extends State<MapSample> {
   Completer _controller = Completer();
   Set<Marker> _markers = {};
   var num = 0;
@@ -58,8 +59,12 @@ class MapSampleState extends State {
   String _pin_info_hashtag = "hashtag";
   var _pin_info_iine = 0;
   var _pin_info_docid = "";
+
+  var _streetview_lat = 0.0;
+  var _streetview_lon = 0.0;
+
   final markerStream =
-      FirebaseFirestore.instance.collection('markerTest').snapshots();
+      FirebaseFirestore.instance.collection('marker').snapshots();
   final MarkerDB markerDB = MarkerDB();
   FloatingSearchBarController controller = FloatingSearchBarController();
 
@@ -171,6 +176,10 @@ class MapSampleState extends State {
                             _pin_info_hashtag = hashtagStr;
                             _pin_info_iine = iineNum;
                             _pin_info_docid = doc.id;
+                            _streetview_lat = data["lat"][0];
+                            _streetview_lon = data["lon"][0];
+                            print(_streetview_lat);
+                            print(_streetview_lon);
                           });
                         });
                   }).toSet(),
@@ -308,6 +317,27 @@ class MapSampleState extends State {
                                           print(_pin_info_iine);
                                           markerDB.updateIine(
                                               _pin_info_docid, _pin_info_iine);
+                                        },
+                                      ),
+                                    )),
+                                Container(
+                                    height: 50,
+                                    color: Colors.white,
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: ElevatedButton(
+                                        child: Text('ストリートビュー'),
+                                        style: ElevatedButton.styleFrom(
+                                          primary: Colors.lightBlue,
+                                          onPrimary: Colors.black,
+                                          shape: const StadiumBorder(),
+                                        ),
+                                        onPressed: () async {
+                                          final url =
+                                              'https://www.google.com/maps/search/?api=1&query=${_streetview_lat},${_streetview_lon}&map_action=pano&parameters';
+                                          if (await canLaunch(url)) {
+                                            launch(url, forceSafariVC: false);
+                                          }
                                         },
                                       ),
                                     )),

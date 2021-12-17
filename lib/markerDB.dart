@@ -12,7 +12,7 @@ class MarkerDB {
   late CollectionReference marker;
 
   MarkerDB() {
-    marker = FirebaseFirestore.instance.collection('markerTest');
+    marker = FirebaseFirestore.instance.collection('marker');
   }
 
   Future<void> addMarker(lat, lon, text, goodDeg, hashtag, {iine = 0}) {
