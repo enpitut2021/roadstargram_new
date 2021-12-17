@@ -61,6 +61,7 @@ class MapSampleState extends State {
   final markerStream =
       FirebaseFirestore.instance.collection('markerTest').snapshots();
   final MarkerDB markerDB = MarkerDB();
+  FloatingSearchBarController controller = FloatingSearchBarController();
 
   static final CameraPosition _kTsukubaStaion = CameraPosition(
     //TsukubaStation
@@ -341,6 +342,7 @@ class MapSampleState extends State {
   Widget buildFloatingSearchBar() {
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
+    //FloatingSearchBarController controller = FloatingSearchBarController();
 
     return FloatingSearchBar(
       hint: 'Search...',
@@ -351,8 +353,10 @@ class MapSampleState extends State {
       axisAlignment: isPortrait ? 0.0 : -1.0,
       openAxisAlignment: 0.0,
       width: isPortrait ? 600 : 500,
+      controller: controller,
       debounceDelay: const Duration(milliseconds: 500),
       onQueryChanged: (query) {
+        //_searchText = query;
         // Call your model, bloc, controller here.
       },
       // Specify a custom transition to be used for
@@ -361,6 +365,7 @@ class MapSampleState extends State {
       onSubmitted: (query) {
         this.setState(() {
           _searchText = query;
+          controller.close();
         });
       },
       actions: [
@@ -381,15 +386,61 @@ class MapSampleState extends State {
           child: Material(
             color: Colors.white,
             elevation: 4.0,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: Colors.accents.map((color) {
-                return Container(height: 0, color: color);
-              }).toList(),
-            ),
+            child: search_recommend(),
           ),
         );
       },
+    );
+  }
+
+  Widget search_recommend() {
+    List<String> hashtags = [
+      'リセットしますか？','春', '夏', '秋', '冬',
+      '晴れ', '雨', '曇り', '雪',
+      '早朝', '朝', '昼', '夜', '深夜',
+      '1人', '友達', '家族', '恋人',
+    ];
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children:
+            hashtags.map((h) {
+              return ListTile(
+                title: Text(h),
+                onTap: () {
+                  print(h);
+                  if (h == hashtags[0]) {
+                    //リセットする
+                    this.setState(() {
+                      _searchText = "";
+                      controller.close();
+                    });
+                  }
+                  else {
+                    this.setState(() {
+                      _searchText = h;
+                      controller.close();
+                    });
+                  }
+                  // _searchText += h;
+
+                }
+              );
+            }).toList()
+
+            // ListView.builder(
+            //   itemCount: 10,
+            //   itemBuilder: (context, index) {
+            //     print('build $index');
+            //
+            //     return Container(
+            //       color: Colors.white,
+            //       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            //       child: Text(
+            //         hashtags[index],
+            //       ),
+            //     );
+            //   },
+            // ),
     );
   }
 
