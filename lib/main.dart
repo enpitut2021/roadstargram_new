@@ -356,7 +356,7 @@ class MapSampleState extends State {
       controller: controller,
       debounceDelay: const Duration(milliseconds: 500),
       onQueryChanged: (query) {
-        _searchText = query;
+        //_searchText = query;
         // Call your model, bloc, controller here.
       },
       // Specify a custom transition to be used for
