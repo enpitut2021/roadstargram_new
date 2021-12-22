@@ -63,6 +63,9 @@ class MapSampleState extends State<MapSample> {
   var _streetview_lat = 0.0;
   var _streetview_lon = 0.0;
 
+  int _filter_type = 0;
+  List<String> _filter_text = ["フィルターなし", "いいレビューのみ", "悪いレビューのみ"];
+
   final markerStream =
       FirebaseFirestore.instance.collection('marker').snapshots();
   final MarkerDB markerDB = MarkerDB();
@@ -120,7 +123,11 @@ class MapSampleState extends State<MapSample> {
             Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
             if (_searchText == "" ||
                 (data["hashtag"]?.contains(_searchText) ?? false)) {
-              searchedDoc.add(doc);
+              if (_filter_type == 1 && doc["goodDeg"] == 1 ||
+                  _filter_type == 2 && doc["goodDeg"] == -1 ||
+                  _filter_type == 0) {
+                searchedDoc.add(doc);
+              }
             }
           });
           return new Scaffold(
@@ -271,6 +278,28 @@ class MapSampleState extends State<MapSample> {
                   },
                   myLocationEnabled: true,
                   myLocationButtonEnabled: true,
+                ),
+                Positioned(
+                    top: 110,
+                    left: 20,
+                    child: Container(
+                      color: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 5.0),
+                      child: Row(
+                        children: [
+                          ElevatedButton(
+                              onPressed: (){
+                                setState(() {
+                                  _filter_type++;
+                                  _filter_type %= 3;
+                                });
+                              },
+                              child: const Text("切り替え")
+                          ),
+                          Text(_filter_text[_filter_type]),
+                        ],
+                      ),
+                    )
                 ),
                 buildFloatingSearchBar(),
                 if (_show_pin_info)
