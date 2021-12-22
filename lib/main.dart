@@ -131,7 +131,7 @@ class MapSampleState extends State<MapSample> {
                   initialCameraPosition: _kTsukubaStaion,
                   polylines: searchedDoc.map((DocumentSnapshot doc) {
                     Map<String, dynamic> data =
-                        doc.data() as Map<String, dynamic>;
+                    doc.data() as Map<String, dynamic>;
                     List<LatLng> latLngList = [];
                     latLngList.add(LatLng(doc["lat"][0], doc["lon"][0]));
                     latLngList.add(LatLng(doc["lat"][1], doc["lon"][1]));
@@ -146,7 +146,7 @@ class MapSampleState extends State<MapSample> {
                   }).toSet(),
                   markers: searchedDoc.map((DocumentSnapshot doc) {
                     Map<String, dynamic> data =
-                        doc.data() as Map<String, dynamic>;
+                    doc.data() as Map<String, dynamic>;
                     int iineNum = data["iine"] ?? 0;
                     String hashtagStr = "";
                     if (data["hashtag"] != null) {
@@ -194,8 +194,8 @@ class MapSampleState extends State<MapSample> {
                     this.setState(() {
                       _show_pin_info = false;
                     });
-                    if (!_is_input_mode) {
-                    } else if (!_is_first_tapped && !_is_second_tapped) {
+                    if (!_is_input_mode) {} else
+                    if (!_is_first_tapped && !_is_second_tapped) {
                       lats = [];
                       lons = [];
                       Fluttertoast.showToast(msg: "終点を入力してください");
@@ -326,11 +326,17 @@ class MapSampleState extends State<MapSample> {
                                     child: Align(
                                       alignment: Alignment.centerLeft,
                                       child: ElevatedButton(
-                                        child: Text('Go to GoogleMap'),
+                                        child: Row(
+                                          children: [
+                                            Image.asset('images/icons8-google-maps-48.png'),
+                                            Text('Google Mapsで確認する'),
+                                          ],
+                                        ),
                                         style: ElevatedButton.styleFrom(
-                                          primary: Colors.lightBlue,
+                                          primary: Colors.white,
                                           onPrimary: Colors.black,
                                           shape: const StadiumBorder(),
+                                          side: const BorderSide(),
                                         ),
                                         onPressed: () async {
                                           final url =
@@ -347,7 +353,7 @@ class MapSampleState extends State<MapSample> {
               ],
             ),
             floatingActionButtonLocation:
-                FloatingActionButtonLocation.centerFloat,
+            FloatingActionButtonLocation.centerFloat,
             floatingActionButton: Visibility(
                 visible: !_show_pin_info,
                 child: FloatingActionButton.extended(
