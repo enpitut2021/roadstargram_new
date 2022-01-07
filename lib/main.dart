@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:roadstargram/markerDB.dart';
@@ -62,6 +63,8 @@ class MapSampleState extends State<MapSample> {
 
   var _streetview_lat = 0.0;
   var _streetview_lon = 0.0;
+
+
 
   int _filter_type = 0;
   List<String> _filter_text = ["フィルターなし", "いいレビューのみ", "悪いレビューのみ"];
@@ -376,6 +379,48 @@ class MapSampleState extends State<MapSample> {
                                         },
                                       ),
                                     )),
+                                Container(
+                                    height: 50,
+                                    color: Colors.white,
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: ElevatedButton(
+                                        child: Row(
+                                          children: [
+                                            Image.asset('images/icons8-google-maps-48.png'),
+                                            Text('この道まで行く'),
+                                          ],
+                                        ),
+                                        style: ElevatedButton.styleFrom(
+                                          primary: Colors.white,
+                                          onPrimary: Colors.black,
+                                          shape: const StadiumBorder(),
+                                          side: const BorderSide(),
+                                        ),
+                                        onPressed: () async {
+
+                                          final position = await Geolocator.getCurrentPosition(
+                                            desiredAccuracy: LocationAccuracy.high,
+                                          );
+                                          // 北緯がプラス。南緯がマイナス
+                                          print("緯度: " + position.latitude.toString());
+                                          // 東経がプラス、西経がマイナス
+                                          print("経度: " + position.longitude.toString());
+                                          // 高度
+                                          print("高度: " + position.altitude.toString());
+
+
+
+                                          //var current_lati = currentPosition.latitude
+                                          final url =
+                                              'https://www.google.com/maps/dir/?api=1&origin=${position.latitude},${position.longitude}&destination=${_streetview_lat},${_streetview_lon}';
+                                              //'https://www.google.com/maps/search/?api=1&query=${_streetview_lat},${_streetview_lon}';
+                                          if (await canLaunch(url)) {
+                                            launch(url, forceSafariVC: false);
+                                          }
+                                        },
+                                      ),
+                                    ))
                               ],
                             ));
                       })
@@ -507,6 +552,7 @@ class MapSampleState extends State<MapSample> {
             //   },
             // ),
     );
+
   }
 
   void _changeText() {
@@ -528,4 +574,22 @@ class MapSampleState extends State<MapSample> {
     }
     return hashtags;
   }
+
+//   Future<void> _setCurrentLocation(ValueNotifier<Position> position,
+//       ValueNotifier<Map<String, Marker>> markers) async {
+//     final currentPosition = await Geolocator.getCurrentPosition(
+//       desiredAccuracy: LocationAccuracy.high,
+//     );
+//
+//     const decimalPoint = 3;
+//     // 過去の座標と最新の座標の小数点第三位で切り捨てた値を判定
+//     if ((position.value.latitude).toStringAsFixed(decimalPoint) !=
+//         (currentPosition.latitude).toStringAsFixed(decimalPoint) &&
+//         (position.value.longitude).toStringAsFixed(decimalPoint) !=
+//             (currentPosition.longitude).toStringAsFixed(decimalPoint)) {
+//
+//       // 現在地座標のstateを更新する
+//       position.value = currentPosition;
+//     }
+//   }
 }
