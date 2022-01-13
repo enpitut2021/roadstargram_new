@@ -279,7 +279,19 @@ class MapSampleState extends State<MapSample> {
                         launch(url, forceSafariVC: false);
                       }
                     },
-                    child: const Text("ドライブルートを作る"),
+                    child: Text("ドライブ開始(${_waypoints.length/2})"),
+                  ),
+                ),
+                Positioned(
+                  top: 150,
+                  right: 20,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      setState(() {
+                        _waypoints.clear();
+                      });
+                    },
+                    child: const Text("ドライブルートのリセット"),
                   ),
                 ),
                 buildFloatingSearchBar(),
@@ -354,49 +366,6 @@ class MapSampleState extends State<MapSample> {
                                           }
                                         },
                                       ),
-                                    )),
-                                Container(
-                                    height: 50,
-                                    color: Colors.white,
-                                    child: Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: ElevatedButton(
-                                        child: Row(
-                                          children: [
-                                            Image.asset('images/icons8-google-maps-48.png'),
-                                            Text('この道まで行く'),
-                                          ],
-                                        ),
-                                        style: ElevatedButton.styleFrom(
-                                          primary: Colors.white,
-                                          onPrimary: Colors.black,
-                                          shape: const StadiumBorder(),
-                                          side: const BorderSide(),
-                                        ),
-                                        onPressed: () async {
-                                          final position = await Geolocator
-                                              .getCurrentPosition(
-                                            desiredAccuracy:
-                                                LocationAccuracy.high,
-                                          );
-                                          // 北緯がプラス。南緯がマイナス
-                                          print("緯度: " +
-                                              position.latitude.toString());
-                                          // 東経がプラス、西経がマイナス
-                                          print("経度: " +
-                                              position.longitude.toString());
-                                          // 高度
-                                          print("高度: " +
-                                              position.altitude.toString());
-
-                                          //var current_lati = currentPosition.latitude
-                                          final url = 'https://www.google.com/maps/dir/?api=1&origin=${position.latitude},${position.longitude}&destination=${_selected_lat_start},${_selected_lon_start}';
-                                          //'https://www.google.com/maps/search/?api=1&query=${_selected_lat_start},${_selected_lon_start}';
-                                          if (await canLaunch(url)) {
-                                            launch(url, forceSafariVC: false);
-                                          }
-                                        },
-                                      ),
                                     )
                                 ),
                                 Container(
@@ -407,8 +376,8 @@ class MapSampleState extends State<MapSample> {
                                       child: ElevatedButton(
                                         child: Row(
                                           children: [
-                                            Image.asset('images/icons8-google-maps-48.png'),
-                                            Text('経由地に追加'),
+                                            Image.asset('images/icons8-root-64.png'),
+                                            Text('ドライブルートに追加'),
                                           ],
                                         ),
                                         style: ElevatedButton.styleFrom(
@@ -417,15 +386,17 @@ class MapSampleState extends State<MapSample> {
                                           shape: const StadiumBorder(),
                                           side: const BorderSide(),
                                         ),
-                                        onPressed: () async {
-                                          _waypoints.add([
-                                            _selected_lat_start,
-                                            _selected_lon_start
-                                          ]);
-                                          _waypoints.add([
-                                            _selected_lat_end,
-                                            _selected_lon_end
-                                          ]);
+                                        onPressed: () {
+                                          setState(() {
+                                            _waypoints.add([
+                                              _selected_lat_start,
+                                              _selected_lon_start
+                                            ]);
+                                            _waypoints.add([
+                                              _selected_lat_end,
+                                              _selected_lon_end
+                                            ]);
+                                          });
                                         },
                                       ),
                                     ))
