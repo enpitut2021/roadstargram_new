@@ -61,10 +61,12 @@ class MapSampleState extends State<MapSample> {
   var _pin_info_iine = 0;
   var _pin_info_docid = "";
 
-  var _streetview_lat = 0.0;
-  var _streetview_lon = 0.0;
+  var _selected_lat_start = 0.0;
+  var _selected_lon_start = 0.0;
+  var _selected_lat_end = 0.0;
+  var _selected_lon_end = 0.0;
 
-
+  List<List<double>> _waypoints = [];
 
   int _filter_type = 0;
   List<String> _filter_text = ["フィルターなし", "いいレビューのみ", "悪いレビューのみ"];
@@ -141,7 +143,7 @@ class MapSampleState extends State<MapSample> {
                   initialCameraPosition: _kTsukubaStaion,
                   polylines: searchedDoc.map((DocumentSnapshot doc) {
                     Map<String, dynamic> data =
-                    doc.data() as Map<String, dynamic>;
+                        doc.data() as Map<String, dynamic>;
                     List<LatLng> latLngList = [];
                     latLngList.add(LatLng(doc["lat"][0], doc["lon"][0]));
                     latLngList.add(LatLng(doc["lat"][1], doc["lon"][1]));
@@ -156,7 +158,7 @@ class MapSampleState extends State<MapSample> {
                   }).toSet(),
                   markers: searchedDoc.map((DocumentSnapshot doc) {
                     Map<String, dynamic> data =
-                    doc.data() as Map<String, dynamic>;
+                        doc.data() as Map<String, dynamic>;
                     int iineNum = data["iine"] ?? 0;
                     String hashtagStr = "";
                     if (data["hashtag"] != null) {
@@ -186,10 +188,12 @@ class MapSampleState extends State<MapSample> {
                             _pin_info_hashtag = hashtagStr;
                             _pin_info_iine = iineNum;
                             _pin_info_docid = doc.id;
-                            _streetview_lat = data["lat"][0];
-                            _streetview_lon = data["lon"][0];
-                            print(_streetview_lat);
-                            print(_streetview_lon);
+                            _selected_lat_start = data["lat"][0];
+                            _selected_lon_start = data["lon"][0];
+                            _selected_lat_end = data["lat"][1];
+                            _selected_lon_end = data["lon"][1];
+                            print(_selected_lat_start);
+                            print(_selected_lon_start);
                           });
                         });
                   }).toSet(),
@@ -204,8 +208,8 @@ class MapSampleState extends State<MapSample> {
                     this.setState(() {
                       _show_pin_info = false;
                     });
-                    if (!_is_input_mode) {} else
-                    if (!_is_first_tapped && !_is_second_tapped) {
+                    if (!_is_input_mode) {
+                    } else if (!_is_first_tapped && !_is_second_tapped) {
                       lats = [];
                       lons = [];
                       Fluttertoast.showToast(msg: "終点を入力してください");
@@ -221,58 +225,10 @@ class MapSampleState extends State<MapSample> {
                       print(lons);
                       print(lats);
                       var _textController = TextEditingController();
-                      Navigator.push(context, MaterialPageRoute(
-                          builder: (context) => PostPage(lats, lons)
-                      ));
-                      // showDialog(
-                      //   context: context,
-                      //   builder: (_) {
-                      //     return AlertDialog(
-                      //       title: Text("レビューを入力"),
-                      //       content: TextField(
-                      //         controller: _textController,
-                      //         decoration: InputDecoration(
-                      //           hintText: '#景色がキレイ #インスタ映え',
-                      //         ),
-                      //         autofocus: true,
-                      //         // keyboardType: TextInputType.number,
-                      //       ),
-                      //       actions: <Widget>[
-                      //         // ボタン領域
-                      //         FlatButton(
-                      //           child: Text("Good!!"),
-                      //           onPressed: () {
-                      //             Navigator.pop(context);
-                      //             markerDB.addMarker(
-                      //               lats,
-                      //               lons,
-                      //               _getNoHashTag(_textController.text),
-                      //               1,
-                      //               _getHashTag(_textController.text),
-                      //             );
-                      //             print('Clicked: $latLang, id: $num');
-                      //             num = num + 1;
-                      //           },
-                      //         ),
-                      //         FlatButton(
-                      //           child: Text("Bad"),
-                      //           onPressed: () {
-                      //             Navigator.pop(context);
-                      //             markerDB.addMarker(
-                      //               lats,
-                      //               lons,
-                      //               _getNoHashTag(_textController.text),
-                      //               -1,
-                      //               _getHashTag(_textController.text),
-                      //             );
-                      //             print('Clicked: $latLang, id: $num');
-                      //             num = num + 1;
-                      //           },
-                      //         ),
-                      //       ],
-                      //     );
-                      //   },
-                      // );
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PostPage(lats, lons)));
                       _is_first_tapped = false;
                       _is_second_tapped = false;
                       _is_input_mode = false;
@@ -287,22 +243,44 @@ class MapSampleState extends State<MapSample> {
                     left: 20,
                     child: Container(
                       color: Colors.white,
-                      padding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 5.0),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 2.0, horizontal: 5.0),
                       child: Row(
                         children: [
                           ElevatedButton(
-                              onPressed: (){
+                              onPressed: () {
                                 setState(() {
                                   _filter_type++;
                                   _filter_type %= 3;
                                 });
                               },
-                              child: const Text("切り替え")
-                          ),
+                              child: const Text("切り替え")),
                           Text(_filter_text[_filter_type]),
                         ],
                       ),
                     )
+                ),
+                Positioned(
+                  top: 110,
+                  right: 20,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      final position = await Geolocator.getCurrentPosition(
+                        desiredAccuracy: LocationAccuracy.high,
+                      );
+                      var url =
+                          'https://www.google.com/maps/dir/?api=1&origin=${position.latitude},${position.longitude}&destination=${position.latitude},${position.longitude}';
+                      url += '&waypoints=';
+                      _waypoints.forEach((w) {
+                        url += '${w[0]},${w[1]}%7C';
+                      });
+                      print(url);
+                      if (await canLaunch(url)) {
+                        launch(url, forceSafariVC: false);
+                      }
+                    },
+                    child: const Text("ドライブルートを作る"),
+                  ),
                 ),
                 buildFloatingSearchBar(),
                 if (_show_pin_info)
@@ -347,8 +325,7 @@ class MapSampleState extends State<MapSample> {
                                         onPressed: () {
                                           _pin_info_iine++;
                                           print(_pin_info_iine);
-                                          markerDB.updateIine(
-                                              _pin_info_docid, _pin_info_iine);
+                                          markerDB.updateIine(_pin_info_docid, _pin_info_iine);
                                         },
                                       ),
                                     )),
@@ -371,8 +348,7 @@ class MapSampleState extends State<MapSample> {
                                           side: const BorderSide(),
                                         ),
                                         onPressed: () async {
-                                          final url =
-                                              'https://www.google.com/maps/search/?api=1&query=${_streetview_lat},${_streetview_lon}';
+                                          final url = 'https://www.google.com/maps/search/?api=1&query=${_selected_lat_start},${_selected_lon_start}';
                                           if (await canLaunch(url)) {
                                             launch(url, forceSafariVC: false);
                                           }
@@ -398,26 +374,58 @@ class MapSampleState extends State<MapSample> {
                                           side: const BorderSide(),
                                         ),
                                         onPressed: () async {
-
-                                          final position = await Geolocator.getCurrentPosition(
-                                            desiredAccuracy: LocationAccuracy.high,
+                                          final position = await Geolocator
+                                              .getCurrentPosition(
+                                            desiredAccuracy:
+                                                LocationAccuracy.high,
                                           );
                                           // 北緯がプラス。南緯がマイナス
-                                          print("緯度: " + position.latitude.toString());
+                                          print("緯度: " +
+                                              position.latitude.toString());
                                           // 東経がプラス、西経がマイナス
-                                          print("経度: " + position.longitude.toString());
+                                          print("経度: " +
+                                              position.longitude.toString());
                                           // 高度
-                                          print("高度: " + position.altitude.toString());
-
-
+                                          print("高度: " +
+                                              position.altitude.toString());
 
                                           //var current_lati = currentPosition.latitude
-                                          final url =
-                                              'https://www.google.com/maps/dir/?api=1&origin=${position.latitude},${position.longitude}&destination=${_streetview_lat},${_streetview_lon}';
-                                              //'https://www.google.com/maps/search/?api=1&query=${_streetview_lat},${_streetview_lon}';
+                                          final url = 'https://www.google.com/maps/dir/?api=1&origin=${position.latitude},${position.longitude}&destination=${_selected_lat_start},${_selected_lon_start}';
+                                          //'https://www.google.com/maps/search/?api=1&query=${_selected_lat_start},${_selected_lon_start}';
                                           if (await canLaunch(url)) {
                                             launch(url, forceSafariVC: false);
                                           }
+                                        },
+                                      ),
+                                    )
+                                ),
+                                Container(
+                                    height: 50,
+                                    color: Colors.white,
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: ElevatedButton(
+                                        child: Row(
+                                          children: [
+                                            Image.asset('images/icons8-google-maps-48.png'),
+                                            Text('経由地に追加'),
+                                          ],
+                                        ),
+                                        style: ElevatedButton.styleFrom(
+                                          primary: Colors.white,
+                                          onPrimary: Colors.black,
+                                          shape: const StadiumBorder(),
+                                          side: const BorderSide(),
+                                        ),
+                                        onPressed: () async {
+                                          _waypoints.add([
+                                            _selected_lat_start,
+                                            _selected_lon_start
+                                          ]);
+                                          _waypoints.add([
+                                            _selected_lat_end,
+                                            _selected_lon_end
+                                          ]);
                                         },
                                       ),
                                     ))
@@ -427,7 +435,7 @@ class MapSampleState extends State<MapSample> {
               ],
             ),
             floatingActionButtonLocation:
-            FloatingActionButtonLocation.centerFloat,
+                FloatingActionButtonLocation.centerFloat,
             floatingActionButton: Visibility(
                 visible: !_show_pin_info,
                 child: FloatingActionButton.extended(
@@ -505,54 +513,63 @@ class MapSampleState extends State<MapSample> {
 
   Widget search_recommend() {
     List<String> hashtags = [
-      'リセットしますか？','春', '夏', '秋', '冬',
-      '晴れ', '雨', '曇り', '雪',
-      '早朝', '朝', '昼', '夜', '深夜',
-      '1人', '友達', '家族', '恋人',
+      'リセットしますか？',
+      '春',
+      '夏',
+      '秋',
+      '冬',
+      '晴れ',
+      '雨',
+      '曇り',
+      '雪',
+      '早朝',
+      '朝',
+      '昼',
+      '夜',
+      '深夜',
+      '1人',
+      '友達',
+      '家族',
+      '恋人',
     ];
     return Column(
-      mainAxisSize: MainAxisSize.min,
-      children:
-            hashtags.map((h) {
-              return ListTile(
-                title: Text(h),
-                onTap: () {
-                  print(h);
-                  if (h == hashtags[0]) {
-                    //リセットする
-                    this.setState(() {
-                      _searchText = "";
-                      controller.close();
-                    });
-                  }
-                  else {
-                    this.setState(() {
-                      _searchText = h;
-                      controller.close();
-                    });
-                  }
-                  // _searchText += h;
-
+        mainAxisSize: MainAxisSize.min,
+        children: hashtags.map((h) {
+          return ListTile(
+              title: Text(h),
+              onTap: () {
+                print(h);
+                if (h == hashtags[0]) {
+                  //リセットする
+                  this.setState(() {
+                    _searchText = "";
+                    controller.close();
+                  });
+                } else {
+                  this.setState(() {
+                    _searchText = h;
+                    controller.close();
+                  });
                 }
-              );
-            }).toList()
+                // _searchText += h;
+              });
+        }).toList()
 
-            // ListView.builder(
-            //   itemCount: 10,
-            //   itemBuilder: (context, index) {
-            //     print('build $index');
-            //
-            //     return Container(
-            //       color: Colors.white,
-            //       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            //       child: Text(
-            //         hashtags[index],
-            //       ),
-            //     );
-            //   },
-            // ),
-    );
-
+        // ListView.builder(
+        //   itemCount: 10,
+        //   itemBuilder: (context, index) {
+        //     print('build $index');
+        //
+        //     return Container(
+        //       color: Colors.white,
+        //       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        //       child: Text(
+        //         hashtags[index],
+        //       ),
+        //     );
+        //   },
+        // ),
+        );
   }
 
   void _changeText() {
