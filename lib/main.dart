@@ -279,7 +279,7 @@ class MapSampleState extends State<MapSample> {
                         launch(url, forceSafariVC: false);
                       }
                     },
-                    child: Text("ドライブ開始(${_waypoints.length/2})"),
+                    child: Text("ドライブ開始(${_waypoints.length~/2})"),
                   ),
                 ),
                 Positioned(
@@ -422,7 +422,7 @@ class MapSampleState extends State<MapSample> {
                     _changeText();
                   },
                   label: Text(_message),
-                  icon: Icon(Icons.directions_bike),
+                  icon: Icon(Icons.directions_car),
                 )),
           );
         });
