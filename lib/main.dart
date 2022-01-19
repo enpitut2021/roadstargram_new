@@ -71,7 +71,7 @@ class MapSampleState extends State<MapSample> {
   List<String> _selected_markerId = [];
 
   int _filter_type = 0;
-  List<String> _filter_text = ["フィルターなし", "いいレビューのみ", "悪いレビューのみ"];
+  final List<String> _filter_text = ["なし", "いいレビューのみ", "悪いレビューのみ"];
 
   final markerStream =
       FirebaseFirestore.instance.collection('marker').snapshots();
@@ -242,60 +242,57 @@ class MapSampleState extends State<MapSample> {
                 ),
                 Positioned(
                     top: 110,
-                    left: 20,
-                    child: Container(
-                      color: Colors.white,
-                      padding:
-                          EdgeInsets.symmetric(vertical: 2.0, horizontal: 5.0),
-                      child: Row(
-                        children: [
-                          ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  _filter_type++;
-                                  _filter_type %= 3;
-                                });
-                              },
-                              child: const Text("切り替え")),
-                          Text(_filter_text[_filter_type]),
-                        ],
-                      ),
+                    right: 20,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Container(
+                          color: Colors.white,
+                          padding:
+                              EdgeInsets.symmetric(vertical: 2.0, horizontal: 5.0),
+                          child: Row(
+                            children: [
+                              ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _filter_type++;
+                                      _filter_type %= 3;
+                                    });
+                                  },
+                                  child: const Text("フィルター")),
+                              Text(_filter_text[_filter_type]),
+                            ],
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: () async {
+                            final position = await Geolocator.getCurrentPosition(
+                              desiredAccuracy: LocationAccuracy.high,
+                            );
+                            var url =
+                                'https://www.google.com/maps/dir/?api=1&origin=${position.latitude},${position.longitude}&destination=${position.latitude},${position.longitude}';
+                            url += '&waypoints=';
+                            _waypoints.forEach((w) {
+                              url += '${w[0]},${w[1]}%7C';
+                            });
+                            print(url);
+                            if (await canLaunch(url)) {
+                              launch(url, forceSafariVC: false);
+                            }
+                          },
+                          child: Text("ドライブ開始(${_waypoints.length~/2})"),
+                        ),
+                        ElevatedButton(
+                          onPressed: () async {
+                            setState(() {
+                              _waypoints.clear();
+                              _selected_markerId.clear();
+                            });
+                          },
+                          child: const Text("ドライブルートのリセット"),
+                        ),
+                      ],
                     )
-                ),
-                Positioned(
-                  top: 110,
-                  right: 20,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      final position = await Geolocator.getCurrentPosition(
-                        desiredAccuracy: LocationAccuracy.high,
-                      );
-                      var url =
-                          'https://www.google.com/maps/dir/?api=1&origin=${position.latitude},${position.longitude}&destination=${position.latitude},${position.longitude}';
-                      url += '&waypoints=';
-                      _waypoints.forEach((w) {
-                        url += '${w[0]},${w[1]}%7C';
-                      });
-                      print(url);
-                      if (await canLaunch(url)) {
-                        launch(url, forceSafariVC: false);
-                      }
-                    },
-                    child: Text("ドライブ開始(${_waypoints.length~/2})"),
-                  ),
-                ),
-                Positioned(
-                  top: 150,
-                  right: 20,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      setState(() {
-                        _waypoints.clear();
-                        _selected_markerId.clear();
-                      });
-                    },
-                    child: const Text("ドライブルートのリセット"),
-                  ),
                 ),
                 buildFloatingSearchBar(),
                 if (_show_pin_info)
