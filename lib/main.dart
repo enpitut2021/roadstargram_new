@@ -68,8 +68,10 @@ class MapSampleState extends State<MapSample> {
 
   List<List<double>> _waypoints = [];
 
+  List<String> _selected_markerId = [];
+
   int _filter_type = 0;
-  List<String> _filter_text = ["フィルターなし", "いいレビューのみ", "悪いレビューのみ"];
+  final List<String> _filter_text = ["なし", "いいレビューのみ", "悪いレビューのみ"];
 
   final markerStream =
       FirebaseFirestore.instance.collection('marker').snapshots();
@@ -91,21 +93,21 @@ class MapSampleState extends State<MapSample> {
       tilt: 59.440717697143555,
       zoom: 19.151926040649414);
 
-  double getMarkerColor(int color) {
-    if (color == 1) {
+  double getMarkerColor(int color, String docId) {
+    if (_selected_markerId.contains(docId)) {
+      return BitmapDescriptor.hueGreen; //マーカーが経由地に含まれるとき
+    } else if (color == 1) {
       return BitmapDescriptor.hueBlue; //good評価
-    } else if (color == 0) {
-      return BitmapDescriptor.hueGreen; //normal評価
     } else {
       return BitmapDescriptor.hueRed; //bad評価
     }
   }
 
-  Color getPolylineColor(int color) {
-    if (color == 1) {
+  Color getPolylineColor(int color, String docId) {
+    if (_selected_markerId.contains(docId)) {
+    return Colors.green; //normal評価
+    } else if (color == 1) {
       return Colors.blue; //good評価
-    } else if (color == 0) {
-      return Colors.green; //normal評価
     } else {
       return Colors.red; //bad評価
     }
@@ -152,7 +154,7 @@ class MapSampleState extends State<MapSample> {
                       visible: true,
                       //latlng is List<LatLng>
                       points: latLngList,
-                      color: getPolylineColor(doc["goodDeg"]),
+                      color: getPolylineColor(doc["goodDeg"], doc.id),
                       width: 6,
                     );
                   }).toSet(),
@@ -172,7 +174,7 @@ class MapSampleState extends State<MapSample> {
                         markerId: MarkerId(doc.id),
                         position: LatLng(latavg, lonavg),
                         icon: BitmapDescriptor.defaultMarkerWithHue(
-                            getMarkerColor(data["goodDeg"])),
+                            getMarkerColor(data["goodDeg"], doc.id)),
                         // infoWindow: InfoWindow(
                         //     title: "${data["text"]}",
                         //     snippet: "いいね数：$iineNum\n$hashtagStr",
@@ -240,59 +242,57 @@ class MapSampleState extends State<MapSample> {
                 ),
                 Positioned(
                     top: 110,
-                    left: 20,
-                    child: Container(
-                      color: Colors.white,
-                      padding:
-                          EdgeInsets.symmetric(vertical: 2.0, horizontal: 5.0),
-                      child: Row(
-                        children: [
-                          ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  _filter_type++;
-                                  _filter_type %= 3;
-                                });
-                              },
-                              child: const Text("切り替え")),
-                          Text(_filter_text[_filter_type]),
-                        ],
-                      ),
+                    right: 20,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Container(
+                          color: Colors.white,
+                          padding:
+                              EdgeInsets.symmetric(vertical: 2.0, horizontal: 5.0),
+                          child: Row(
+                            children: [
+                              ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _filter_type++;
+                                      _filter_type %= 3;
+                                    });
+                                  },
+                                  child: const Text("フィルター")),
+                              Text(_filter_text[_filter_type]),
+                            ],
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: () async {
+                            final position = await Geolocator.getCurrentPosition(
+                              desiredAccuracy: LocationAccuracy.high,
+                            );
+                            var url =
+                                'https://www.google.com/maps/dir/?api=1&origin=${position.latitude},${position.longitude}&destination=${position.latitude},${position.longitude}';
+                            url += '&waypoints=';
+                            _waypoints.forEach((w) {
+                              url += '${w[0]},${w[1]}%7C';
+                            });
+                            print(url);
+                            if (await canLaunch(url)) {
+                              launch(url, forceSafariVC: false);
+                            }
+                          },
+                          child: Text("ドライブ開始(${_waypoints.length~/2})"),
+                        ),
+                        ElevatedButton(
+                          onPressed: () async {
+                            setState(() {
+                              _waypoints.clear();
+                              _selected_markerId.clear();
+                            });
+                          },
+                          child: const Text("ドライブルートのリセット"),
+                        ),
+                      ],
                     )
-                ),
-                Positioned(
-                  top: 110,
-                  right: 20,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      final position = await Geolocator.getCurrentPosition(
-                        desiredAccuracy: LocationAccuracy.high,
-                      );
-                      var url =
-                          'https://www.google.com/maps/dir/?api=1&origin=${position.latitude},${position.longitude}&destination=${position.latitude},${position.longitude}';
-                      url += '&waypoints=';
-                      _waypoints.forEach((w) {
-                        url += '${w[0]},${w[1]}%7C';
-                      });
-                      print(url);
-                      if (await canLaunch(url)) {
-                        launch(url, forceSafariVC: false);
-                      }
-                    },
-                    child: Text("ドライブ開始(${_waypoints.length/2})"),
-                  ),
-                ),
-                Positioned(
-                  top: 150,
-                  right: 20,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      setState(() {
-                        _waypoints.clear();
-                      });
-                    },
-                    child: const Text("ドライブルートのリセット"),
-                  ),
                 ),
                 buildFloatingSearchBar(),
                 if (_show_pin_info)
@@ -396,6 +396,7 @@ class MapSampleState extends State<MapSample> {
                                               _selected_lat_end,
                                               _selected_lon_end
                                             ]);
+                                            _selected_markerId.add(_pin_info_docid);
                                           });
                                         },
                                       ),
@@ -422,7 +423,7 @@ class MapSampleState extends State<MapSample> {
                     _changeText();
                   },
                   label: Text(_message),
-                  icon: Icon(Icons.directions_bike),
+                  icon: Icon(Icons.directions_car),
                 )),
           );
         });
