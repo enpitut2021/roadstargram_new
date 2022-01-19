@@ -68,6 +68,8 @@ class MapSampleState extends State<MapSample> {
 
   List<List<double>> _waypoints = [];
 
+  List<String> _selected_markerId = [];
+
   int _filter_type = 0;
   List<String> _filter_text = ["フィルターなし", "いいレビューのみ", "悪いレビューのみ"];
 
@@ -91,21 +93,21 @@ class MapSampleState extends State<MapSample> {
       tilt: 59.440717697143555,
       zoom: 19.151926040649414);
 
-  double getMarkerColor(int color) {
-    if (color == 1) {
+  double getMarkerColor(int color, String docId) {
+    if (_selected_markerId.contains(docId)) {
+      return BitmapDescriptor.hueGreen; //マーカーが経由地に含まれるとき
+    } else if (color == 1) {
       return BitmapDescriptor.hueBlue; //good評価
-    } else if (color == 0) {
-      return BitmapDescriptor.hueGreen; //normal評価
     } else {
       return BitmapDescriptor.hueRed; //bad評価
     }
   }
 
-  Color getPolylineColor(int color) {
-    if (color == 1) {
+  Color getPolylineColor(int color, String docId) {
+    if (_selected_markerId.contains(docId)) {
+    return Colors.green; //normal評価
+    } else if (color == 1) {
       return Colors.blue; //good評価
-    } else if (color == 0) {
-      return Colors.green; //normal評価
     } else {
       return Colors.red; //bad評価
     }
@@ -152,7 +154,7 @@ class MapSampleState extends State<MapSample> {
                       visible: true,
                       //latlng is List<LatLng>
                       points: latLngList,
-                      color: getPolylineColor(doc["goodDeg"]),
+                      color: getPolylineColor(doc["goodDeg"], doc.id),
                       width: 6,
                     );
                   }).toSet(),
@@ -172,7 +174,7 @@ class MapSampleState extends State<MapSample> {
                         markerId: MarkerId(doc.id),
                         position: LatLng(latavg, lonavg),
                         icon: BitmapDescriptor.defaultMarkerWithHue(
-                            getMarkerColor(data["goodDeg"])),
+                            getMarkerColor(data["goodDeg"], doc.id)),
                         // infoWindow: InfoWindow(
                         //     title: "${data["text"]}",
                         //     snippet: "いいね数：$iineNum\n$hashtagStr",
@@ -289,6 +291,7 @@ class MapSampleState extends State<MapSample> {
                     onPressed: () async {
                       setState(() {
                         _waypoints.clear();
+                        _selected_markerId.clear();
                       });
                     },
                     child: const Text("ドライブルートのリセット"),
@@ -396,6 +399,7 @@ class MapSampleState extends State<MapSample> {
                                               _selected_lat_end,
                                               _selected_lon_end
                                             ]);
+                                            _selected_markerId.add(_pin_info_docid);
                                           });
                                         },
                                       ),
